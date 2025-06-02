@@ -125,3 +125,142 @@ src/
 [MIT](LICENSE)
 
 Enjoy & happy migrating! 🎉
+
+
+
+# 🚚 **jsx-migr8**
+
+---
+
+## Project overview
+
+### Why we built it – the never-ending **Common → Latitude** migration
+
+Anchorage’s front-end still contains thousands of `<Text>` and other design-system components imported from `@anchorage/common`.
+Maintaining *two* DS packages forces every feature team to:
+
+* scan huge codebases to discover what still lives in **Common**
+* hand-convert dozens of subtle prop/variant changes (often by search-and-replace 😱)
+* run risky “big-bang” PRs that break styling or behaviour
+
+The pain is time, risk and developer frustration.
+
+### Vision – **jsx-migr8** to the rescue
+
+`jsx-migr8` is a CLI that:
+
+1. **Scans** the whole repo on every run → an always-fresh graph of imports and JSX usage.
+2. **Shows** prop statistics in a friendly table so teams can pick what matters.
+3. **Generates** machine-readable migration specs (*Migr8Spec*) instead of ad-hoc scripts.
+4. **Transforms & commits** code with AST-aware rules, preserving formatting and complex expressions.
+
+Result: repeatable, reviewable, *safe* migrations that scale with the design-system roadmap.
+
+---
+
+## Milestones & tasks
+
+Below is a Linear-ready break-down.  Each bullet is a task; indentations are sub-tasks where helpful.
+
+---
+
+### 🔬 **Proof of Concept**
+
+| ID      | Title                                    | Goal / expected outcome                                                       |
+| ------- | ---------------------------------------- | ----------------------------------------------------------------------------- |
+| **P-1** | Minimal AST parser spike                 | Parse a single file, list all `import` statements and corresponding JSX tags. |
+| **P-2** | Naïve codebase scanner                   | Recursively walk a root folder, collect the above info into an in-memory map. |
+| **P-3** | JSON usage report (`usage.json`)         | Persist the map so we can inspect results between runs.                       |
+| **P-4** | First hard-coded remap (`Text` → `Text`) | Transform one file in memory and print the diff to StdOut.                    |
+| **P-5** | CLI wrapper (`jsx-migr8 scan`)           | Expose root-path flag, run tasks P-2 to P-4 from the terminal.                |
+
+---
+
+### 🎉 **Release 1.0 – “The Wizard era”**
+
+
+**Queue folder bootstrap**            
+     Create `./queue/` with `component-spec.json` scaffold on first run.                
+
+
+Interactive **Wizard CLI**            
+     Step-by-step prompts to fill `component-spec.json` (old & new import, alias type). 
+
+
+Generate stub **Migr8Rule** JSON      
+     Write `migr8Rules/<old>-to-<new>.json` with `TODO:` markers.                       
+
+
+Props scanner & frequency table       
+     Analyse selected component, show combinations + counts.                            
+
+
+Colourised **diff preview**           
+     Git-style output with context lines for every file to be changed.                  
+
+
+`--dryRun` / `--yolo` flags           
+     Choice between preview-only and in-place file rewrite (with backup).               
+
+
+Basic logging helper                  
+     Consistent `INFO / WARN / SUCS` prefixes; quiet by default.                        
+
+
+CLI flags (`root`, `blacklist`, etc.) 
+     Configurable without editing code.                                                 
+
+
+Named vs default import handling      
+     Correctly map `import Text` *and* `import { Text }` forms.                         
+
+
+Example rule: **Text-to-Text**        
+     Production-ready JSON used by Design-System team.                                  
+
+
+Unit tests for utils                  
+     Jest coverage for diff maker, path helpers, loggers.                               
+
+
+Publish **v1.0.0** & docs             
+     Tagged release, README update and internal demo.                                   
+
+
+
+---
+
+### 🚀 **Release 2.0 – Graph & Spec renaissance**  *(current)*
+
+
+- **Graph builder** replaces old reports            
+  - Always scan on start → `graph.jsx` & `graph.imports`, no stale JSON.                     
+- Remove Wizard; new **dependency-first CLI**       
+  - Scan → choose packages/components interactively → no more manual folder editing.         
+- New **`Migr8Spec` schema**                        
+  - Single file holds `lookup` + multiple component rule-blocks; loader with CLI precedence. 
+- Multi-package/component prop tables               
+  - Allow selecting many packages & comps, show individual prop tables.                      
+- **Migration engine** consumes `Migr8Spec.rules[]` 
+  - Adapt rule-matcher, import-rewriter, diff printer to new data-model.                     
+- Preserve original **value node types**            
+  - `rename` / `set` keep AST (`CallExpression`, etc.), not strings.                         
+- Support `renameSpecifiers` & `dropSpecifiers`     
+  - Enables package-wide icon migration; implement with Icons example.                       
+- Improved diff UX & flow                           
+  - Select spec → dry-run preview per file → confirm → mutate; collapsible diffs.            
+- Remove legacy code & JSONs                        
+  - Delete `reportGlobalUsage`, wizard modules; optional `graph.json` export only.           
+
+*(Extra tasks grouped so milestone stays at \~8 items while covering M1–M8 initiatives.)*
+
+---
+
+## How to import into Linear
+
+* **Project** → **🚚 jsx-migr8**
+* Copy the **Overview** section into the project description.
+* Create three **Milestones** named as above, with the indicated tasks.
+* Paste each task title & description; mark sub-tasks where indented.
+
+That’s it – the full history and the path ahead are now captured in Linear. 🎯

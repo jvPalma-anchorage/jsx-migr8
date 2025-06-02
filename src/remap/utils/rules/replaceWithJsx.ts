@@ -1,12 +1,10 @@
+import { getAstFromCode } from "@/utils/fs-utils";
 import { builders as b } from "ast-types";
-import { parse, print } from "recast";
-import babelParser from "recast/parsers/babel-ts";
+import { print } from "recast";
 import { MigrationMapper } from "../../../migrator/types";
 import { JSXAttribute, JSXElement } from "../../../types";
 import { makeDiff } from "../../../utils/diff";
 import { RemapRule } from "../../base-remapper";
-import { New } from "../../common-latitude/Text/newConstants";
-import { Old } from "../../common-latitude/Text/oldConstants";
 import { newAttr } from "../jsxUtils/newAttr";
 import { pickAttrs } from "../jsxUtils/pickAttrs";
 import { stringToJsx } from "../stringToJsx";
@@ -14,7 +12,7 @@ import { stringToJsx } from "../stringToJsx";
 export function stringToJsxElement(tpl: string): JSXElement {
   // wrap in a fragment so the parser accepts plain JSX
   const wrapped = `<>${tpl}</>`;
-  const ast = parse(wrapped, { parser: babelParser });
+  const ast = getAstFromCode(wrapped);
 
   // program.body[0] -> ExpressionStatement -> Fragment -> children[0]
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -22,8 +20,8 @@ export function stringToJsxElement(tpl: string): JSXElement {
 }
 
 type PropAndRule = {
-  rule: Omit<RemapRule<any, any>, "replaceWith"> & {
-    replaceWith: NonNullable<RemapRule<any, any>["replaceWith"]>;
+  rule: Omit<RemapRule, "replaceWith"> & {
+    replaceWith: NonNullable<RemapRule["replaceWith"]>;
   };
   elem: MigrationMapper[string]["elements"][number];
   compName: string;
@@ -31,17 +29,19 @@ type PropAndRule = {
 };
 export const handleReplaceWithJsx = (
   changeCode: boolean,
-  { rule, elem, filePath }: PropAndRule
+  { rule, elem, compName, filePath }: PropAndRule
 ) => {
   const {
     set,
     remove,
     replaceWith: { INNER_PROPS: INNER_PROP_KEYS_TO_MOVE, code },
   } = rule;
-  const { jsxPath, jsxOpening: opener } = elem;
+
+  const jsxElement = elem.opener.node;
+  const opener = jsxElement.openingElement;
 
   // * REMOVE old props from the element
-  const elemProps: Record<string, string> = {};
+  const elemProps: Record<string, any> = {};
   Object.entries(elem.props).forEach(([key, _]) => {
     if (remove && (remove as string[]).includes(key)) {
       return false; // skip props that should be removed
@@ -56,20 +56,21 @@ export const handleReplaceWithJsx = (
   const INNER_ADD: JSXAttribute[] = [];
 
   // * SET new props on the component
-  Object.entries(set).forEach(([key, value]) => {
-    if (typeof value === "string") {
-      OUTER_ADD.push(newAttr(key, b.stringLiteral(value)));
-    }
-    if (typeof value === "boolean") {
-      OUTER_ADD.push(newAttr(key, b.booleanLiteral(value)));
-    }
-    if (typeof value === "number") {
-      OUTER_ADD.push(newAttr(key, b.numericLiteral(value)));
-    }
-    if (value === null) {
-      OUTER_ADD.push(newAttr(key, b.nullLiteral()));
-    }
-  });
+  set &&
+    Object.entries(set).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        OUTER_ADD.push(newAttr(key, b.stringLiteral(value)));
+      }
+      if (typeof value === "boolean") {
+        OUTER_ADD.push(newAttr(key, b.booleanLiteral(value)));
+      }
+      if (typeof value === "number") {
+        OUTER_ADD.push(newAttr(key, b.numericLiteral(value)));
+      }
+      if (value === null) {
+        OUTER_ADD.push(newAttr(key, b.nullLiteral()));
+      }
+    });
 
   Object.keys(elemProps).forEach((key) => {
     const propAsJsxAttr = existingPropsAsJSXAttr.find(
@@ -96,7 +97,7 @@ export const handleReplaceWithJsx = (
     }
   });
 
-  const oldSnippet = print(jsxPath.node)
+  const oldSnippet = print(jsxElement)
     .code.trim()
     .replace("{' '}", "")
     .replaceAll("\n\n", "\n");
@@ -105,7 +106,7 @@ export const handleReplaceWithJsx = (
   const newElement = stringToJsx(code, {
     OUTER_PROPS: OUTER_ADD,
     INNER_PROPS: INNER_ADD,
-    CHILDREN: jsxPath.node.children, // keep original children
+    CHILDREN: jsxElement.children, // keep original children
   });
 
   const newSnippet = print(newElement)
@@ -115,5 +116,5 @@ export const handleReplaceWithJsx = (
 
   console.info(makeDiff(filePath, `${oldSnippet}\n`, `(${newSnippet})\n`, 2));
 
-  jsxPath.replace(newElement);
+  elem.opener.replace(newElement);
 };

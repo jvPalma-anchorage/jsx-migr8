@@ -1,11 +1,9 @@
 import { RemapRule } from "../../base-remapper";
-import { New } from "./newConstants.ts";
-import { Old } from "./oldConstants.ts";
 import { importStmMapper as imp } from "./packages.ts";
 
 const importStmMapper = Object.keys(imp).length > 0 ? {} : {};
 
-export const customRules: RemapRule<Old, New>[] = [
+export const customRules: RemapRule[] = [
   {
     order: 1,
     /* 1️⃣  --- WHEN does the rule fire? ---------------------------------- */
@@ -78,7 +76,7 @@ export const customRules: RemapRule<Old, New>[] = [
     set: {
       variant: "bodyRegular",
     },
-    importFrom: 'OLD_PACKAGE',
-    importTo: 'NEW_PACKAGE',
+    importFrom: "OLD_PACKAGE",
+    importTo: "NEW_PACKAGE",
   },
 ];

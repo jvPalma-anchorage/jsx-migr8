@@ -1,20 +1,19 @@
+import { JsxUsage } from "@/graph/types";
+import { RemapRule } from "@/remap/base-remapper";
 import { lWarning } from "../../../context/globalContext";
-import { RemapRule } from "../../base-remapper";
-import { New } from "../../common-latitude/Text/newConstants";
-import { Old } from "../../common-latitude/Text/oldConstants";
 
 export const matchesRule = (
-  propsNow: Record<string, string | undefined>,
-  matchArr: Record<string, any>[] = [],
+  propsNow: JsxUsage["props"],
+  matchArr: Record<string, any>[] = []
 ): boolean => {
   if (matchArr.length === 0) return true; // no conditions → always match
 
   // split into “positive” and “negative” objects
   const positives = matchArr.filter(
-    (obj) => !Object.keys(obj).some((k) => k.startsWith("!")),
+    (obj) => !Object.keys(obj).some((k) => k.startsWith("!"))
   );
   const negatives = matchArr.filter((obj) =>
-    Object.keys(obj).some((k) => k.startsWith("!")),
+    Object.keys(obj).some((k) => k.startsWith("!"))
   );
 
   /* ---------- helpers ---------- */
@@ -47,10 +46,25 @@ export const matchesRule = (
   return positiveOK && negativeOK;
 };
 
+/**
+ * 
+ * type Migr8Rule = {
+    package: string;
+    importType: `TODO:${string}` | "named" | "default";
+    component: string;
+    importTo: {
+        importStm: `TODO:${string}` | string;
+        component: `TODO:${string}` | string;
+        importType: `TODO:${string}` | "named" | "default";
+    };
+    rules: RemapRule[];
+}
+ */
 export const getRuleMatch = (
-  rules: RemapRule<Old, New>[],
-  propsNow: Record<string, string | undefined>,
+  rules: RemapRule[],
+  propsNow: JsxUsage["props"]
 ) => {
+  // TODO: REPLACE THIS OLD FILE LOGIC TO MATCH THE NEW MIGR8 RULES
   const rule = rules.find((r) => matchesRule(propsNow, r.match));
 
   if (rule) {

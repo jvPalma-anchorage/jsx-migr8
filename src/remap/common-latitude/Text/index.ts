@@ -16,10 +16,7 @@ import { importStmMapper as imp } from "./packages.ts";
 
 const importStmMapper = Object.keys(imp).length > 0 ? {} : {};
 
-const mapper = (
-  type?: OldTypes,
-  size?: OldSizes
-): RemapRule<Old, New> | null => {
+const mapper = (type?: OldTypes, size?: OldSizes): RemapRule | null => {
   const match: any = {};
   const findOldProps: {
     type: OldTypes;
@@ -85,7 +82,7 @@ export const propsAvailableToRemap = ["tag", "type", "size"];
 
 export const remapperOld = (PACKAGES: string[]): RemapFile<Old, New> => {
   // * DIRECT PROP REPLACEMENT
-  const genericRules: RemapRule<Old, New>[] = [];
+  const genericRules: RemapRule[] = [];
   allPropsCombinationRules().forEach(({ type, size }) => {
     const rule = mapper(type, size);
     rule && genericRules.push(rule);
@@ -105,10 +102,7 @@ export const remapperOld = (PACKAGES: string[]): RemapFile<Old, New> => {
   return basePropsRemap(PACKAGES, components);
 };
 
-export const remapper = (
-  pkg: string,
-  compName: string
-): RemapRule<Old, New>[] => {
+export const remapper = (pkg: string, compName: string): RemapRule[] => {
   // * DIRECT PROP REPLACEMENT
 
   const rules = customRules.map(
@@ -116,7 +110,7 @@ export const remapper = (
       ({
         ...rule,
         importFrom: pkg,
-      }) as RemapRule<Old, New>
+      }) as RemapRule
   );
 
   return rules;

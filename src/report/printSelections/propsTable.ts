@@ -1,11 +1,10 @@
+import { filterWhiteListedProps } from "@/report/utils";
+import { ComponentUsage } from "@/types";
 import chalk, { BackgroundColorName, ColorName } from "chalk";
-import { ComponentUsage } from "../../../types";
-import { filterWhiteListedProps } from "../props";
 
 export type PropRowItem = {
   count: number;
   props: Record<string, string>;
-  files: string[];
 };
 
 const printCustomCliTable = (
@@ -15,9 +14,15 @@ const printCustomCliTable = (
   data: Record<string, string | number>[]
 ) => {
   const print = printTable ? console.info : () => {};
+
   const prepareText = (text: string, isHeader: boolean, i: number) => {
-    const noData = i > 2 && text === "-";
+    const dataColumns = i > 1;
+    const noData = dataColumns && text === "-";
     let printText = "";
+
+    if (!dataColumns) {
+      return text.padStart(3);
+    }
 
     if (text.length > 16) {
       printText = `${text.slice(0, 13)}...`;
@@ -69,30 +74,23 @@ const printCustomCliTable = (
       )
     );
   };
+  const seperatorRow = header.map((_, i) =>
+    i > 1 ? "----------------" : "---"
+  );
 
   print("\n\n");
-  pRow(
-    header.map(() => "----------------"),
-    "header"
-  );
+  pRow(seperatorRow, "separator");
   pRow(header, "header");
-  pRow(
-    header.map(() => "----------------"),
-    "header"
-  );
+  pRow(seperatorRow, "separator");
   [totals].forEach((rowObj, idx) => {
     /* mantém a ordem de header — já inclui "#" e "Usages"              */
     const cells = header.map((h) => String(rowObj[h] ?? "-"));
     /* +2 : linha-0 = header, linha-1 = separador; corpo começa em 2    */
     pRow(cells, idx + 2);
   });
-  pRow(
-    header.map(() => "----------------"),
-    "header"
-  );
+  pRow(seperatorRow, "separator");
 
   /* 6 ▸ imprime cada linha (totais + dados) --------------------------- */
-
   data.forEach((rowObj, idx) => {
     /* mantém a ordem de header — já inclui "#" e "Usages"              */
     const cells = header.map((h) => String(rowObj[h] ?? "-"));
@@ -101,10 +99,7 @@ const printCustomCliTable = (
   });
 
   /* 7 ▸ linha final de separação ------------------------------------- */
-  pRow(
-    header.map(() => "----------------"),
-    "header"
-  );
+  pRow(seperatorRow, "separator");
   print(
     chalk.bgGray(
       chalk.whiteBright("   - #1 ▸ ID of the table row".padEnd(130, " "))
@@ -125,7 +120,7 @@ const printCustomCliTable = (
 
 export const buildUsageTable = (
   usages: ComponentUsage[],
-  propsOrderedByUsage: string[],
+  propsSortedByUsage: string[],
   printTable = true
 ): {
   rows: PropRowItem[];
@@ -139,14 +134,33 @@ export const buildUsageTable = (
       ([a], [b]) => a.localeCompare(b)
     );
     const key = JSON.stringify(sortedEntries);
-    if (!seen.has(key))
+    if (!seen.has(key)) {
+      const filteredEntries: [string, any][] = [];
+      sortedEntries.forEach(([k, v]) => {
+        const filterPropValues: any = {
+          key: k,
+          value: v,
+        };
+
+        if (["onClick"].includes(filterPropValues.key)) {
+          filterPropValues.value = true;
+        }
+
+        if (["isLoading", "disabled"].includes(filterPropValues.key)) {
+          if (!["true", "false"].includes(filterPropValues.value)) {
+            filterPropValues.value = "migr8-expression";
+          }
+        }
+
+        filteredEntries.push([filterPropValues.key, filterPropValues.value]);
+      });
+
       seen.set(key, {
         count: 0,
-        props: Object.fromEntries(sortedEntries),
-        files: [u.impObj.filePath],
+        props: Object.fromEntries(filteredEntries),
       });
+    }
     seen.get(key)!.count++;
-    seen.get(key)!.files.push(u.impObj.filePath);
   });
 
   //* 2 ▸ sorts ROWS by number of props (desc) */
@@ -160,19 +174,16 @@ export const buildUsageTable = (
 
   //* primeiro as props ordenadas por uso, depois quaisquer restantes (alfab.) */
   const orderedKeys = [
-    ...propsOrderedByUsage.filter((k) => allPropKeys.has(k)),
+    ...propsSortedByUsage.filter((k) => allPropKeys.has(k)),
     ...Array.from(allPropKeys)
-      .filter((k) => !propsOrderedByUsage.includes(k))
+      .filter((k) => !propsSortedByUsage.includes(k))
       .sort(),
   ];
 
-  const header = ["#", "Usages", ...orderedKeys];
+  const header = ["#1", "#2", ...orderedKeys];
 
   //* first totals row */
-  const totals: Record<string, string | number> = {
-    "#1": "",
-    "#2": "",
-  };
+  const totals: Record<string, string | number> = {};
   orderedKeys.forEach(
     (k) => (totals[k] = usages.filter((u) => k in u.props).length + "x")
   );
@@ -180,8 +191,8 @@ export const buildUsageTable = (
   //* converts rows to flat object for console.table */
   const data = rows.map((r, i) => {
     const obj: Record<string, string | number> = {
-      "#": i + 1,
-      Usages: r.count,
+      "#1": i + 1,
+      "#2": r.count,
     };
     orderedKeys.forEach((k) => (obj[k] = k in r.props ? r.props[k] : "-"));
     return obj;

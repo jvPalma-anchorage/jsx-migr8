@@ -1,97 +1,75 @@
+import { getContext } from "@/context";
+import { Migr8Spec } from "@/report/types";
+import { ComponentPropsSummary, ComponentUsage } from "@/types";
+import { MIGRATE_RULES_DIR } from "@/utils/constants";
 import chalk from "chalk";
-import { getContext } from "../context/globalContext";
-import { RemapRule } from "../remap/base-remapper";
-import { ComponentPropsSummary, ComponentUsage } from "../types";
-import { MIGRATE_RULES_DIR } from "../utils/constants";
-import { ALL_COMPS, ALL_PKS } from "./utils/constants";
-import { buildUsageTable } from "./utils/printSelections/propsTable";
+import { Selections } from ".";
+import { buildUsageTable } from "./printSelections";
 
-export type PropsToRules = {
-  summary: ComponentPropsSummary;
-  pkgSel: string;
-  compSel: string;
-  propsSorted: string[];
-};
-export const genMigr8Rule = async ({
-  pkgSel,
-  summary,
-  compSel,
-  propsSorted,
-}: PropsToRules) => {
-  const { compSpec } = getContext();
+const migr8RuleComponent = (
+  pkgName: string,
+  oldComponent: string
+): Migr8Spec["migr8rules"][number] => ({
+  package: pkgName,
+  importType: "TODO: named | default",
+  component: oldComponent,
+  importTo: {
+    importStm: "TODO: New import statement",
+    importType: "TODO: named | default",
+    component: "TODO: new component name",
+  },
+  rules: [],
+});
+
+export const genMigr8Rule = async (
+  summary: ComponentPropsSummary,
+  selections: Selections
+) => {
+  const { packages, components, tables } = selections;
+
+  const parsedComponents = components.map((c) => c.split("|")[1]);
 
   // same logic as "table" but harvesting the rows ------------------
-  let usages: ComponentUsage[] = [];
-  if (pkgSel === ALL_PKS) {
-    Object.values(summary).forEach((c) =>
-      Object.values(c).forEach((u) => usages.push(...u))
-    );
-  } else if (compSel.endsWith(`|${ALL_COMPS}`)) {
-    const comps = summary[pkgSel] || {};
-    Object.values(comps).forEach((u) => usages.push(...u));
-  } else {
-    const [, compName] = compSel.split("|");
-    usages = summary[pkgSel]?.[compName] || [];
-  }
-
-  const { rows } = buildUsageTable(usages, propsSorted, false);
-
-  const payload: {
-    [pkg: string]: { [compName: string]: RemapRule<any, any>[] };
-  } = {};
+  const payload: Migr8Spec = {
+    lookup: {
+      rootPath: getContext().ROOT_PATH,
+      packages: packages,
+      components: parsedComponents,
+    },
+    migr8rules: [],
+  };
 
   let lastIndex = 1;
+  tables.forEach(({ value }) => {
+    const pkgSel = value.package;
+    const compSel = value.component.split("|")[1];
+    const migr8Base = migr8RuleComponent(pkgSel, compSel);
+    const usages: ComponentUsage[] = summary[pkgSel]![compSel]! || [];
 
-  /* 2 ▸ wrap into { COMP: [ … ] } --------------------------------- */
-  const [, compNameForFile] = compSel.endsWith(`|${ALL_COMPS}`)
-    ? ["", compSpec!.old.compName]
-    : compSel.split("|")[1];
+    const { rows } = buildUsageTable(usages, value.propsSortedByUsage, false);
 
-  /* 1 ▸ convert rows -> RemapRule[] ------------------------------- */
-  if (pkgSel === ALL_PKS) {
-    compSpec!.old.oldImportPath.forEach((pkg) => {
-      payload[pkg] = {
-        [compNameForFile]: [],
-      };
-    });
-  } else {
-    payload[pkgSel] = {
-      [compNameForFile]: [],
-    };
-  }
-
-  rows.forEach((r, i) => {
-    const rule = {
-      order: 0,
-      match: [r.props], // OR-array with a single AND-object
-      set: {}, // empty – fill later
-      remove: [], // empty – fill later
-      files: r.files,
-      newCompName: compSpec!.new.compName,
-      importFrom: pkgSel,
-      importTo: compSpec!.new.newImportPath,
-    };
-    if (pkgSel === ALL_PKS) {
-      compSpec!.old.oldImportPath.forEach((pkg) => {
-        payload[pkg][compSpec!.old.compName].push({
-          ...rule,
-          order: lastIndex++,
-          importFrom: pkg,
-        });
-      });
-    } else {
-      payload[pkgSel][compSpec!.old.compName].push({
-        ...rule,
+    rows.forEach((r) => {
+      const rule = {
         order: lastIndex++,
-      });
-    }
+        match: [r.props],
+        set: {},
+        remove: [],
+      };
+      migr8Base.rules.push(rule);
+    });
+    payload.migr8rules.push(migr8Base);
   });
+
+  const currentTime = Math.round(Date.now() / 1000);
 
   /* 3 ▸ write file ------------------------------------------------- */
   const fs = await import("node:fs");
-  const fileFullPath = `${MIGRATE_RULES_DIR}/${compSpec?.old.compName}-to-${compSpec?.new.compName}-migr8.json`;
+  const fileFullPath = `${MIGRATE_RULES_DIR}/${currentTime}-${parsedComponents.join("-")}-migr8.json`;
   fs.mkdirSync(MIGRATE_RULES_DIR, { recursive: true });
 
   fs.writeFileSync(fileFullPath, JSON.stringify(payload, null, 2), "utf8");
-  console.info(chalk.green(`\n💾  Saved rules to ${fileFullPath}\n`));
+  return chalk.green(`
+  💾  Created Migr8Rule file: ${fileFullPath}
+  🚨  Be sure to fill in all the \`TODO:\` in the file before using it!
+  `);
 };

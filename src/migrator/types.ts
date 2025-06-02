@@ -1,5 +1,6 @@
 import { types as T } from "recast";
 
+import { JsxUsage } from "@/graph/types";
 import { ComponentUsage, JSXPath } from "../types";
 
 export type JsxData = {
@@ -11,15 +12,14 @@ export type JsxData = {
 };
 
 export type MigrationMapper = {
-  [filePath: string]: {
-    pkg: string;
-    compName: string;
-    codeCompare?: {
-      ast: T.ASTNode;
+  [fileAbsPath: string]: {
+    packageName: string;
+    component: string;
+    codeCompare: {
+      ast: T.ASTNode | undefined;
       old: string;
-      new: string;
     };
     importNode: ComponentUsage["impObj"];
-    elements: JsxData[];
+    elements: JsxUsage[];
   };
 };

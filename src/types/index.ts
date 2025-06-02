@@ -1,6 +1,7 @@
 import type { NodePath } from "ast-types/lib/node-path";
 import { types } from "recast";
 import { argv } from "../cli/config";
+import { ImportUsage, ProjectGraph } from "../graph/types";
 
 // ** ---------- RECAST MAPPED TYPES ------------------------------ */
 export type { NodePath };
@@ -57,7 +58,7 @@ export type ImportDetails = {
 };
 
 export type ImportSpecifierDetails = {
-  filePath: string;
+  file: string;
   type: NonNullable<ImportDeclaration["specifiers"]>[number]["type"];
   importType: "named" | "default" | undefined;
   importStm: string;
@@ -67,6 +68,12 @@ export type ImportSpecifierDetails = {
 };
 
 export type ComponentUsage = {
+  props: Record<string, string>;
+  originalProps: Record<string, string>;
+  impObj: ImportUsage;
+};
+
+export type DeprecatedComponentUsage = {
   /** original component name in the package */
   name: string;
   filePath: string;
@@ -114,6 +121,6 @@ export type GlobalState = {
   REPORT_GLOBAL_USAGE: string;
   reportGlobalUsage: GlobalReport | undefined;
   REPORT_COMPONENT_USAGES: string;
-  reportComponentUsages: ComponentPropsSummary | undefined;
   runArgs: typeof argv;
+  graph?: ProjectGraph;
 };

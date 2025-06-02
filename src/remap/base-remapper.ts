@@ -1,47 +1,41 @@
-type RuleMatch = Record<string, string | boolean>;
-type RuleSet = Record<string, string | boolean>;
+type RuleMatch = Record<string, any>;
+type RuleSet = Record<string, any>;
 
 // ---------- Types -----------------------------------------------------------
-export type RemapRule<O extends RuleMatch, N extends RuleSet> = {
+export type RemapRule = {
   order: number;
   /** list of props that must ALL be present with those exact values    */
   match: RuleMatch[];
   /** props to *add* or *replace*                                       */
-  set?: N;
+  set?: RuleSet;
   /** props to *remove*                                                 */
-  remove?: (keyof O)[];
+  remove?: (keyof RuleMatch)[];
   /** props to *rename*                                                 */
-  rename?: Record<keyof O, keyof N>[];
+  rename?: Record<keyof RuleMatch, keyof RuleSet>[];
   /** optional import rewriting                                         */
-  files?: string[];
-  newCompName?: string;
-  importFrom?: string;
-  importTo?: string;
   replaceWith?: {
     code: string;
     INNER_PROPS?: string[];
   };
 };
 
-export type RemapFile<O extends RuleMatch, N extends RuleSet> = {
+export type RemapFile = {
   [pkg: string]: {
-    [component: string]: RemapRule<O, N>[];
+    [component: string]: RemapRule[];
   };
 };
 
-export const basePropsRemap = <O extends RuleMatch, N extends RuleSet>(
+export const basePropsRemap = (
   pks: string[],
-  components: Record<string, RemapRule<O, N>[]>[]
-): RemapFile<O, N> => {
-  const remapRules: RemapFile<O, N> = {};
+  components: Record<string, RemapRule[]>[]
+): RemapFile => {
+  const remapRules: RemapFile = {};
 
   pks.forEach((pkg) => {
     remapRules[pkg] = remapRules[pkg] || {};
     components.forEach((comp) => {
       Object.entries(comp).forEach(([compName, rules]) => {
-        remapRules[pkg][compName] = rules.map((r) =>
-          r.importFrom ? { ...r, importFrom: pkg } : r
-        );
+        remapRules[pkg][compName] = rules;
       });
     });
   });

@@ -1,50 +1,46 @@
-import fs from "node:fs";
+import { getContext, lWarning } from "@/context/globalContext";
+import { MigrationMapper } from "@/migrator/types";
+import { Migr8Spec } from "@/report";
 import { print, visit } from "recast";
-import { getContext, lError } from "../../../context/globalContext";
-import { MigrationMapper } from "../../../migrator/types";
-import { RemapRule } from "../../base-remapper";
-import { impRemove } from "./impRemove";
-import { impSet } from "./impSet";
 import { propRemove } from "./propRemove";
 import { propSet } from "./propSet";
 import { handleReplaceWithJsx } from "./replaceWithJsx";
 import { getRuleMatch } from "./ruleMatch";
 
-
-
 export const applyRemapRule = (
   changeCode: boolean,
-  [filePath, migrationObj]: [string, MigrationMapper[string]]
+  [fileAbsPath, migrationObj]: [string, MigrationMapper[string]],
+  migr8Specs: Migr8Spec
 ) => {
-  const { compSpec } = getContext();
+  const { graph } = getContext();
+
   let mutated = false;
   const changed = () => {
     mutated = true;
   };
 
-  let rules: RemapRule<any, any>[] = [];
+  const spec = migr8Specs.migr8rules.find(
+    (r) =>
+      r.package === migrationObj.packageName &&
+      r.component === migrationObj.component
+  );
 
-  const migr8FilePath = `./migr8Rules/${migrationObj.compName}-to-${compSpec!.new.compName}-migr8.json`;
-
-  try {
-    rules = JSON.parse(fs.readFileSync(migr8FilePath, "utf8"))[
-      migrationObj.compName
-    ];
-  } catch (_error) {
-    lError("Loading Migr8 File", `could not find file ${migr8FilePath}`);
-
-    process.exit(0);
+  if (!spec) {
+    lWarning(
+      "No migr8 rule found",
+      `for ${migrationObj.packageName} - ${migrationObj.component}`
+    );
+    return false;
   }
+  const migr8rules = spec.rules;
+  const locName = migrationObj.component;
 
-  if (!rules || rules.length) {
-    lError("No rules", `could not find any rules in ${migr8FilePath}`);
-  }
   const toPrune: Set<string> = new Set();
 
   migrationObj.elements.forEach((elem) => {
-    const rule = getRuleMatch(rules, elem.props);
+    const rule = getRuleMatch(migr8rules, elem.props);
     if (!rule) return;
-    const opener = elem.jsxOpening;
+    const opener = elem.opener.node.openingElement;
 
     // *
     // ? REPLACE WITH RULE
@@ -59,8 +55,8 @@ export const applyRemapRule = (
       handleReplaceWithJsx(changeCode, {
         rule: rule as any, // this is OK, im tired.
         elem,
-        compName: migrationObj.compName,
-        filePath,
+        compName: locName,
+        filePath: fileAbsPath,
       });
 
       return;
@@ -69,26 +65,38 @@ export const applyRemapRule = (
     // ** ---------- PROPS [ REMOVE ] ---------------------------------- */
     if (rule.remove && rule.remove.length > 0) {
       rule.remove.forEach((propToRemove) => {
-        changed();
+        mutated = true;
         propRemove(opener, propToRemove);
+        mutated &&
+          console.log(
+            `Removed prop "${propToRemove}" from ${locName} in ${fileAbsPath}`
+          );
       });
     }
     // ** ---------- PROPS [ RENAME ] ---------------------------------- */
     if (rule.rename && Object.entries(rule.rename).length > 0) {
       Object.entries(rule.rename).forEach(([from, to]) => {
-        changed();
-        const val = elem.props[from];
+        mutated = true;
+        const val = elem.props[from] as unknown as string | boolean;
         if (val !== undefined) {
           propRemove(opener, `${from}`);
           propSet(opener, `${to}`, val);
         }
+        mutated &&
+          console.log(
+            `Renamed prop "${from}" to "${to}" in ${locName} in ${fileAbsPath}`
+          );
       });
     }
     // ** ------------ PROPS [ SET ] ------------------------------------ */
     if (rule.set && Object.entries(rule.set).length > 0) {
       Object.entries(rule.set).forEach(([k, v]) => {
-        changed();
+        mutated = true;
         propSet(opener, k, v);
+        mutated &&
+          console.log(
+            `Set prop "${k}" to "${v}" in ${locName} in ${fileAbsPath}`
+          );
       });
     }
   });
@@ -97,27 +105,24 @@ export const applyRemapRule = (
   // ** ---------- IMPORT [   ADD   COMP IMPORT   TO  NEW PKG  ] ---------------------------- */
   // ** ---------- IMPORT [ ADD OLD PKG TO PRUNE LIST IF EMPTY ] ---------------------------- */
   migrationObj.elements.forEach((elem) => {
-    const rule = getRuleMatch(rules, elem.props);
+    const rule = getRuleMatch(migr8rules, elem.props);
     if (!rule) return;
 
-    // ** ------ Migrate [ IMPORT STATEMENTS] --------------------------- */
-    if (rule.importFrom && rule.importTo) {
-      changed();
-      const pruneImport = impRemove(
-        migrationObj.codeCompare?.ast!,
-        migrationObj
-      );
-      if (!!pruneImport) {
-        toPrune.add(pruneImport);
-      }
+    // // ** ------ Migrate [ IMPORT STATEMENTS] --------------------------- */
+    // if (rule.importFrom && rule.importTo) {
+    //   mutated = true;
 
-      impSet(
-        migrationObj.codeCompare?.ast!,
-        migrationObj.importNode.importedName ||
-          migrationObj.importNode.localName,
-        rule.importTo
-      );
-    }
+    //   const pruneImport = impRemove(
+    //     migrationObj.codeCompare?.ast!,
+    //     migrationObj
+    //   );
+
+    //   if (!!pruneImport) {
+    //     toPrune.add(pruneImport);
+    //   }
+
+    //   impSet(migrationObj.codeCompare?.ast!, locName, rule.importTo);
+    // }
   });
 
   // ** ---------- IMPORT [  REMOVE OLD PGK IMPORT IF EMPTY ] ---------------------------- */

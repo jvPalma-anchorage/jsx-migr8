@@ -5,50 +5,98 @@ import fs from "node:fs";
 import { print } from "recast";
 
 /* ---------- load remap rules (your generator returns the full map) -------- */
+import { getMigr8RulesFileNames } from "@/utils/fs-utils";
+import { transformFileIntoOptions } from "@/utils/migr8.utils";
 import { input, select } from "@inquirer/prompts";
 import chalk from "chalk";
+import { graphToComponentSummary } from "../compat/usageSummary";
 import { getContext, lSuccess } from "../context/globalContext";
 import { applyRemapRule } from "../remap/utils/rules";
 import { makeDiff } from "../utils/diff";
+import { getCompName } from "../utils/pathUtils";
 import { prepareReportToMigrate } from "./utils/prepareReportToMigrate";
 
 export const migrateComponents = async (changeCode = false) => {
-  const { runArgs, PACKAGES, reportComponentUsages: report } = getContext();
-  if (!report) {
+  const { runArgs, graph } = getContext();
+
+  const summary = graphToComponentSummary(graph!);
+
+  if (!summary) {
     return;
   }
-  const migrationMapper = prepareReportToMigrate(PACKAGES, report);
+
+  const migr8RuleFiles = getMigr8RulesFileNames();
+
+  if (!migr8RuleFiles || migr8RuleFiles.length === 0) {
+    return `
+⚠ No Migr8 files found to use.
+Please create one in "🔍  Inspect components"`;
+  }
+
+  const fileOptions = transformFileIntoOptions();
+
+  /* ── 2.5  import type (named or default)  */
+  const migr8Spec = await select({
+    message: "🔗  Pick an Migr8 :",
+    choices: fileOptions,
+  });
+
+  const migrationMapper = prepareReportToMigrate(migr8Spec, summary);
+
   const successMigrated: string[] = [];
+  const couldMigrate: string[] = [];
 
   Object.entries(migrationMapper).forEach((migrationObj) => {
-    const changed = applyRemapRule(changeCode, migrationObj);
+    const changed = applyRemapRule(changeCode, migrationObj, migr8Spec);
     if (!changed) {
       return;
     }
-    const [filePath, fileCompleteData] = migrationObj;
-    const { codeCompare, elements, compName } = fileCompleteData;
+    const [fileAbsPath, fileCompleteData] = migrationObj;
+    const { codeCompare, elements, importNode } = fileCompleteData;
 
-    // const filePath = fileCompleteData.importNode.filePath;
+    const locName = getCompName(
+      importNode.local,
+      importNode.imported,
+      importNode.importedType
+    );
+
+    // const fileAbsPath = fileCompleteData.importNode.fileAbsPath;
     const oldCode = codeCompare!.old || "1 N/A";
-    const newCode = print(codeCompare!.ast).code || "2 N/A";
+    const newCode = print(codeCompare.ast!).code || "2 N/A";
 
     if (changeCode) {
-      fs.writeFileSync(filePath, newCode);
+      fs.writeFileSync(fileAbsPath, newCode);
       successMigrated.push(
         [
           "migrated",
           " (",
           chalk.yellow(elements.length),
           ") ",
-          chalk.yellow(compName),
+          chalk.yellow(locName),
           " in ",
-          chalk.yellow(filePath),
+          chalk.yellow(fileAbsPath),
         ].join("")
       );
     } else {
-      console.info("🎉", makeDiff(filePath, oldCode, newCode, 2));
+      couldMigrate.push(
+        [
+          "would migrate",
+          chalk.yellow(locName),
+          " in ",
+          chalk.yellow(fileAbsPath),
+        ].join("")
+      );
+
+      console.info("🎉", makeDiff(fileAbsPath, oldCode, newCode, 2));
     }
   });
+
+  if (!changeCode) {
+    couldMigrate.forEach((e) => {
+      const str = e.split(" migrate");
+      lSuccess(str[0] + " migrate", str[1]);
+    });
+  }
 
   if (changeCode || runArgs.debug) {
     successMigrated.forEach((e) => {

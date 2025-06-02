@@ -54,8 +54,10 @@
     "diff": "8.0.2",
     "eslint": "9.28.0",
     "eslint-config-prettier": "10.1.5",
+    "module-alias": "2.2.3",
     "prettier": "3.3.3",
     "ts-node": "10.9.2",
+    "tsconfig-paths": "4.2.0",
     "tsup": "8.5.0",
     "tsx": "4.19.4",
     "typescript": "5.8.3"

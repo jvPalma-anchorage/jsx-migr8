@@ -1,28 +1,57 @@
 import { ComponentPropsSummary } from "../../types";
 import { OptionValue } from "../types";
-import { ALL_COMPS, ALL_PKS } from "./constants";
 import { filterWhiteListedProps } from "./props";
-
-const allPkgsOption: OptionValue = {
-  name: `All - All the packages below`,
-  value: ALL_PKS,
-  description: "Select all packages",
-  short: "📦 All packages",
-};
 
 /** Given the usages, returns the package options array (first SELECT) */
 export const buildPkgOptions = (
   summary: ComponentPropsSummary
 ): OptionValue[] => {
-  const pkgOptions: OptionValue[] = [allPkgsOption];
+  const pkgOptions: OptionValue[] = [];
 
-  Object.keys(summary).forEach((pkgName, idx) => {
-    pkgOptions.push({
-      name: `[${idx + 1}] - ${pkgName}`,
-      value: pkgName,
-      short: `🧩 ${pkgName}`,
+  const lastSrtOrder = [
+    "../../../../../../",
+    "../../../../../",
+    "../../../../",
+    "../../../",
+    "../../",
+    "../",
+    "./",
+    ".",
+  ];
+  Object.keys(summary)
+    .sort((a, b) => {
+      const aIsAt = a.startsWith("@");
+      const bIsAt = b.startsWith("@");
+      const aIsRelative = a.startsWith(".");
+      const bIsRelative = b.startsWith(".");
+
+      // @ packages come first
+      if (aIsAt && !bIsAt) return -1;
+      if (!aIsAt && bIsAt) return 1;
+
+      // Relative paths come last
+      if (!aIsRelative && bIsRelative) return -1;
+      if (aIsRelative && !bIsRelative) return 1;
+
+      // Both are relative paths - sort by depth (fewer ../ first)
+      if (aIsRelative && bIsRelative) {
+        const aIndex = lastSrtOrder.findIndex((s) => a.startsWith(s));
+        const bIndex = lastSrtOrder.findIndex((s) => b.startsWith(s));
+        if (aIndex !== -1 && bIndex !== -1) {
+          return bIndex - aIndex; // reverse order for relative paths
+        }
+      }
+
+      // Default alphabetical sort
+      return a.localeCompare(b);
+    })
+    .forEach((pkgName, idx) => {
+      pkgOptions.push({
+        name: `[${idx + 1}]`.padStart(5, " ") + ` - ${pkgName}`,
+        value: pkgName,
+        short: `📦 ${pkgName}`,
+      });
     });
-  });
 
   return pkgOptions;
 };
@@ -30,51 +59,31 @@ export const buildPkgOptions = (
 /** Builds component options map and props → values map */
 export const buildComponentMaps = (summary: ComponentPropsSummary) => {
   /** compPkgOptions[pkg] = second SELECT options (components) */
-  const compPkgOptions: Record<string, OptionValue[]> = {
-    [ALL_PKS]: [
-      {
-        name: `All components found for all packages!`,
-        value: `${ALL_PKS}|${ALL_COMPS}`,
-        short: `🧩 All Components from 📦 All Packages`,
-      },
-    ],
-  };
+  const compPkgOptions: Record<string, OptionValue[]> = {};
 
   /** keysPerComp[pkg|comp] = { propKey: [values…] } */
   const keysPerComp: Record<string, Record<string, string[]>> = {};
 
   Object.entries(summary).forEach(([pkgName, compObj], pIdx) => {
-    const compKeyAll = `${pkgName}|${ALL_COMPS}` as const;
-    /* initializes list for the package, with "All components …" option */
-    compPkgOptions[pkgName] = [
-      {
-        name: `All components found for package [${pkgName}]`,
-        value: compKeyAll,
-        short: `🧩 All Components from 📦 ${pkgName} package`,
-      },
-    ];
+    compPkgOptions[pkgName] = [];
 
     Object.entries(compObj).forEach(([compName, usages], cIdx) => {
-      const keyAllAll = `${ALL_PKS}|${ALL_COMPS}` as const;
       const compKey = `${pkgName}|${compName}` as const;
 
       const opt: OptionValue = {
-        name: `[${pIdx + 1}.${cIdx + 1}] - ${compName}`,
-        description: `Component [ ${compName} ] from ${pkgName} package`,
+        name: `[${pIdx + 1}.${cIdx + 1}]`.padStart(5, " ") + ` - ${compName}`,
         value: compKey,
-        short: `🧩 ${compName} Component from 📦 ${pkgName} package`,
+        short: `${compName} from ${pkgName}`,
+        description: `🧩 ${compName}  from  📦 ${pkgName}`,
       };
 
-      compPkgOptions[ALL_PKS].push(opt);
       compPkgOptions[pkgName].push(opt);
 
       usages.forEach(({ props }) => {
         const parsed = filterWhiteListedProps(props);
         Object.entries(parsed).forEach(([propKey, propVal]) => {
-          for (const key of [keyAllAll, compKeyAll, compKey]) {
-            (keysPerComp[key] = keysPerComp[key] || {})[propKey] ??= [];
-            keysPerComp[key][propKey].push(propVal);
-          }
+          (keysPerComp[compKey] = keysPerComp[compKey] || {})[propKey] ??= [];
+          keysPerComp[compKey][propKey].push(propVal);
         });
       });
     });
