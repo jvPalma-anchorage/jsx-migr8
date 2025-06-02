@@ -45,8 +45,13 @@ async function ensureReports(): Promise<void> {
 /*  interactive menu                                                   */
 /* ──────────────────────────────────────────────────────────────────── */
 async function mainMenu(): Promise<void> {
-  let firstRun = true;
-  let lastPicked = undefined;
+  let lastPicked:
+    | "wizard"
+    | "generateReports"
+    | "showProps"
+    | "dryRun"
+    | "migrate"
+    | undefined = undefined;
   while (true) {
     /* clear previous screen */
 
@@ -121,15 +126,18 @@ async function mainMenu(): Promise<void> {
 
     choices.push({ name: "⏹  Exit", value: "exit" });
 
-    const preSelectedOption = (() => {
-      if (!compSpec || (compSpec && lastPicked === "wizard")) {
+    const preSelectedOption = () => {
+      if (!compSpec) {
+        return "wizard";
+      }
+      if (lastPicked === "wizard") {
         return "wizard";
       }
       if (!reportComponentUsages) {
         return "generateReports";
       }
       return "showProps";
-    })();
+    };
 
     console.info("\n");
 
@@ -138,6 +146,8 @@ async function mainMenu(): Promise<void> {
       choices,
       default: preSelectedOption,
     });
+
+    lastPicked = action as NonNullable<typeof lastPicked>;
 
     /* dispatch -------------------------------------------------------- */
     switch (action) {

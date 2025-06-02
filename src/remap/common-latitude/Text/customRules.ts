@@ -7,6 +7,7 @@ const importStmMapper = Object.keys(imp).length > 0 ? {} : {};
 
 export const customRules: RemapRule<Old, New>[] = [
   {
+    order: 1,
     /* 1️⃣  --- WHEN does the rule fire? ---------------------------------- */
     /*     Any *one* of these objects needs to match (= OR between them).
      *     Inside an object every entry must match (= AND).
@@ -70,13 +71,14 @@ export const customRules: RemapRule<Old, New>[] = [
   //   importFrom: OLD_PACKAGE,
   //   importTo: NEW_PACKAGE,
   // },
-  // {
-  //   match: [{ color: "muted", size: "small" }],
-  //   remove: ["color", "size"],
-  //   set: {
-  //     variant: "bodyRegular",
-  //   },
-  //   importFrom: OLD_PACKAGE,
-  //   importTo: NEW_PACKAGE,
-  // },
+  {
+    order: 2,
+    match: [{ color: "muted", size: "small" }],
+    remove: ["color", "size"],
+    set: {
+      variant: "bodyRegular",
+    },
+    importFrom: 'OLD_PACKAGE',
+    importTo: 'NEW_PACKAGE',
+  },
 ];

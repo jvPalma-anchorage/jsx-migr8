@@ -1,6 +1,8 @@
+import fs from "node:fs";
 import { print, visit } from "recast";
-import { MigrationMapper } from "../../../migrator";
-import { remapper } from "../../common-latitude/Text";
+import { getContext, lError } from "../../../context/globalContext";
+import { MigrationMapper } from "../../../migrator/types";
+import { RemapRule } from "../../base-remapper";
 import { impRemove } from "./impRemove";
 import { impSet } from "./impSet";
 import { propRemove } from "./propRemove";
@@ -8,16 +10,35 @@ import { propSet } from "./propSet";
 import { handleReplaceWithJsx } from "./replaceWithJsx";
 import { getRuleMatch } from "./ruleMatch";
 
-export const parseThroughRules = (
+
+
+export const applyRemapRule = (
   changeCode: boolean,
   [filePath, migrationObj]: [string, MigrationMapper[string]]
 ) => {
+  const { compSpec } = getContext();
   let mutated = false;
   const changed = () => {
     mutated = true;
   };
 
-  const rules = remapper(migrationObj.pkg, migrationObj.compName);
+  let rules: RemapRule<any, any>[] = [];
+
+  const migr8FilePath = `./migr8Rules/${migrationObj.compName}-to-${compSpec!.new.compName}-migr8.json`;
+
+  try {
+    rules = JSON.parse(fs.readFileSync(migr8FilePath, "utf8"))[
+      migrationObj.compName
+    ];
+  } catch (_error) {
+    lError("Loading Migr8 File", `could not find file ${migr8FilePath}`);
+
+    process.exit(0);
+  }
+
+  if (!rules || rules.length) {
+    lError("No rules", `could not find any rules in ${migr8FilePath}`);
+  }
   const toPrune: Set<string> = new Set();
 
   migrationObj.elements.forEach((elem) => {

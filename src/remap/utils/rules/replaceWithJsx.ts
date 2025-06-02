@@ -1,7 +1,7 @@
 import { builders as b } from "ast-types";
 import { parse, print } from "recast";
 import babelParser from "recast/parsers/babel-ts";
-import { MigrationMapper } from "../../../migrator";
+import { MigrationMapper } from "../../../migrator/types";
 import { JSXAttribute, JSXElement } from "../../../types";
 import { makeDiff } from "../../../utils/diff";
 import { RemapRule } from "../../base-remapper";
@@ -22,8 +22,8 @@ export function stringToJsxElement(tpl: string): JSXElement {
 }
 
 type PropAndRule = {
-  rule: Omit<RemapRule<Old, New>, "replaceWith"> & {
-    replaceWith: NonNullable<RemapRule<Old, New>["replaceWith"]>;
+  rule: Omit<RemapRule<any, any>, "replaceWith"> & {
+    replaceWith: NonNullable<RemapRule<any, any>["replaceWith"]>;
   };
   elem: MigrationMapper[string]["elements"][number];
   compName: string;

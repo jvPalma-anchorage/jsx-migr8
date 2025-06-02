@@ -1,0 +1,741 @@
+{
+  "@anchorage/common/dist/components/Text": {
+    "Text": [
+      {
+        "order": 11,
+        "match": [
+          {
+            "size": "large"
+          },
+          {
+            "type": "body",
+            "size": "large"
+          },
+          {
+            "type": "heading",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingSmall"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 13,
+        "match": [
+          {
+            "size": "medium"
+          },
+          {
+            "type": "body"
+          },
+          {
+            "type": "body",
+            "size": "medium"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingTiny"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 15,
+        "match": [
+          {
+            "size": "small"
+          },
+          {
+            "type": "body",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "bodyRegular"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 17,
+        "match": [
+          {
+            "size": "tiny"
+          },
+          {
+            "type": "body",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "bodyMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 19,
+        "match": [
+          {
+            "type": "heading"
+          },
+          {
+            "type": "heading",
+            "size": "medium"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 21,
+        "match": [
+          {
+            "type": "label"
+          },
+          {
+            "type": "label",
+            "size": "medium"
+          },
+          {
+            "type": "label",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "labelMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 23,
+        "match": [
+          {
+            "type": "link"
+          },
+          {
+            "type": "link",
+            "size": "medium"
+          },
+          {
+            "type": "link",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "linkStandalone"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 25,
+        "match": [
+          {
+            "type": "metric"
+          },
+          {
+            "type": "metric",
+            "size": "medium"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricLarge"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 27,
+        "match": [
+          {
+            "type": "mono"
+          },
+          {
+            "type": "mono",
+            "size": "medium"
+          },
+          {
+            "type": "mono",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "snippetRegular"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 29,
+        "match": [
+          {
+            "type": "heading",
+            "size": "huge"
+          },
+          {
+            "type": "heading",
+            "size": "large"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingLarge"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 31,
+        "match": [
+          {
+            "type": "label",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "labelSmall"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 33,
+        "match": [
+          {
+            "type": "metric",
+            "size": "large"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricHuge"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 35,
+        "match": [
+          {
+            "type": "metric",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 37,
+        "match": [
+          {
+            "type": "metric",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricSmall"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 39,
+        "match": [
+          {
+            "type": "mono",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "snippetMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components/Text",
+        "importTo": "@latitude/text"
+      }
+    ]
+  },
+  "@anchorage/common/dist/components": {
+    "Text": [
+      {
+        "order": 1,
+        "match": [
+          {
+            "tag": "a"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "asChild": true,
+          "variant": "linkStandalone",
+          "color": "info"
+        },
+        "replaceWith": {
+          "INNER_PROPS": ["target", "rel", "href", "onClick"],
+          "code": "\n  <Text {...OUTER_PROPS}>\n    <a {...INNER_PROPS}>\n       {CHILDREN}\n    </a>\n  </Text>"
+        },
+        "files": [
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/CentralizedClientView/components/AffiliateIssues/constants.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/CentralizedClientView/components/AffiliateMembers/AffiliateRepresentative/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/clients/ClientsManagementPage/ClientDetailsPage/GeneralInformation/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/clients/ClientsManagementPage/ClientDetailsPage/GenerateUrlButton/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/clients/ClientsManagementPage/GeneralInformation/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/common/AffiliateName/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/common/EditQuestionnaireDirect/EditFieldContent/StaticContent/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/common/Hyperlink/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/common/Link/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/common/NotesCard/DrawerContent/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Operations/OperationPage/OperationDetailPages/components/pages/WithdrawOperationInfo/TravelRuleBanner/Link.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Operations/OperationPage/OperationDetailPages/components/shared/DestinationAddressSection/FiatTransactionInfo.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Operations/OperationPage/OperationHeader/components/DistressSignalBanner/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Operations/OperationPage/OperationPolicy/OperationInitiator/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Organizations/OrganizationPage/OrganizationReferenceIDs/IDTable/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Organizations/OrganizationPage/OrganizationSubaccounts/IndividualSubaccountPage/TransactionsPage/TransactionDrawer/Body/AssignedInfoSection/AssociatedTransactionInfo.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Organizations/OrganizationPage/OrganizationSubaccounts/IndividualSubaccountPage/TransactionsPage/TransactionDrawer/Body/TransactionTypeSection/index.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Organizations/OrganizationPage/OrganizationVault/shared/TextWithTooltipCell/TextWithTooltipCell.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Organizations/OrganizationPage/OrganizationVault/WalletsDrawer/WalletsDrawerContent/Body/WalletCard/Header/OtherAssetsList.tsx",
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Organizations/OrganizationPage/OrganizationVault/WalletsDrawer/WalletsDrawerContent/Body/WalletCard/Header/PooledBalances.tsx"
+        ],
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 2,
+        "match": [
+          {
+            "role": "button"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "asChild": true,
+          "variant": "snippetRegular"
+        },
+        "replaceWith": {
+          "INNER_PROPS": ["tabIndex"],
+          "code": "\n  <Text {...OUTER_PROPS}>\n    <button {...INNER_PROPS}>\n       {CHILDREN}\n    </button>\n  </Text>"
+        },
+        "files": [
+          "/home/user/anchorage/source/js/anchorage/apps/backoffice/src/components/Organizations/OrganizationPage/OrganizationVault/shared/TextWithTooltipCell/TextWithTooltipCell.tsx"
+        ],
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 3,
+        "match": [
+          {
+            "onClick": true,
+            "tag": "span"
+          },
+          {
+            "onClick": true,
+            "type": "link"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "asChild": true,
+          "variant": "linkStandalone",
+          "color": "info"
+        },
+        "replaceWith": {
+          "INNER_PROPS": ["onClick"],
+          "code": "\n  <Text {...OUTER_PROPS}>\n    <button {...INNER_PROPS}>\n       {CHILDREN}\n    </button>\n  </Text>"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 4,
+        "match": [
+          {
+            "tag": "span"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "bodyRegular"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 5,
+        "match": [
+          {
+            "onClick": true
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "asChild": true,
+          "variant": "bodyRegular"
+        },
+        "replaceWith": {
+          "INNER_PROPS": ["onClick"],
+          "code": "\n  <Text {...OUTER_PROPS}>\n    <button {...INNER_PROPS}>\n       {CHILDREN}\n    </button>\n  </Text>"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 9,
+        "match": [
+          {
+            "htmlFor": true
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "asChild": true,
+          "variant": "bodyRegular"
+        },
+        "replaceWith": {
+          "INNER_PROPS": ["htmlFor"],
+          "code": "\n  <Text {...OUTER_PROPS}>\n    <label {...INNER_PROPS}>\n       {CHILDREN}\n    </label>\n  </Text>"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 9,
+        "match": [
+          {
+            "tag": "label"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "asChild": true,
+          "variant": "bodyRegular"
+        },
+        "replaceWith": {
+          "code": "\n  <Text {...OUTER_PROPS}>\n    <label>\n       {CHILDREN}\n    </label>\n  </Text>"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 10,
+        "match": [
+          {
+            "tag": "h1"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 12,
+        "match": [
+          {
+            "size": "large"
+          },
+          {
+            "type": "body",
+            "size": "large"
+          },
+          {
+            "type": "heading",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingSmall"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 14,
+        "match": [
+          {
+            "size": "medium"
+          },
+          {
+            "type": "body"
+          },
+          {
+            "type": "body",
+            "size": "medium"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingTiny"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 16,
+        "match": [
+          {
+            "size": "small"
+          },
+          {
+            "type": "body",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "bodyRegular"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 18,
+        "match": [
+          {
+            "size": "tiny"
+          },
+          {
+            "type": "body",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "bodyMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 20,
+        "match": [
+          {
+            "type": "heading"
+          },
+          {
+            "type": "heading",
+            "size": "medium"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 22,
+        "match": [
+          {
+            "type": "label"
+          },
+          {
+            "type": "label",
+            "size": "medium"
+          },
+          {
+            "type": "label",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "labelMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 24,
+        "match": [
+          {
+            "type": "link"
+          },
+          {
+            "type": "link",
+            "size": "medium"
+          },
+          {
+            "type": "link",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "linkStandalone"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 26,
+        "match": [
+          {
+            "type": "metric"
+          },
+          {
+            "type": "metric",
+            "size": "medium"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricLarge"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 28,
+        "match": [
+          {
+            "type": "mono"
+          },
+          {
+            "type": "mono",
+            "size": "medium"
+          },
+          {
+            "type": "mono",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "snippetRegular"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 30,
+        "match": [
+          {
+            "type": "heading",
+            "size": "huge"
+          },
+          {
+            "type": "heading",
+            "size": "large"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "headingLarge"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 32,
+        "match": [
+          {
+            "type": "label",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "labelSmall"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 34,
+        "match": [
+          {
+            "type": "metric",
+            "size": "large"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricHuge"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 36,
+        "match": [
+          {
+            "type": "metric",
+            "size": "small"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 38,
+        "match": [
+          {
+            "type": "metric",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "metricSmall"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 40,
+        "match": [
+          {
+            "type": "mono",
+            "size": "tiny"
+          }
+        ],
+        "remove": ["tag", "type", "size"],
+        "set": {
+          "variant": "snippetMedium"
+        },
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      },
+      {
+        "order": 47,
+        "match": [{}],
+        "set": {},
+        "remove": [],
+        "importFrom": "@anchorage/common/dist/components",
+        "importTo": "@latitude/text"
+      }
+    ]
+  }
+}

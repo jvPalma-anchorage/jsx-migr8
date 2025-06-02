@@ -1,21 +1,20 @@
-import { parse } from "recast";
-import babelParser from "recast/parsers/babel-ts";
-import { JSXElement } from "../types";
-
 type RuleMatch = Record<string, string | boolean>;
 type RuleSet = Record<string, string | boolean>;
 
 // ---------- Types -----------------------------------------------------------
 export type RemapRule<O extends RuleMatch, N extends RuleSet> = {
+  order: number;
   /** list of props that must ALL be present with those exact values    */
   match: RuleMatch[];
   /** props to *add* or *replace*                                       */
-  set: N;
+  set?: N;
   /** props to *remove*                                                 */
   remove?: (keyof O)[];
   /** props to *rename*                                                 */
   rename?: Record<keyof O, keyof N>[];
   /** optional import rewriting                                         */
+  files?: string[];
+  newCompName?: string;
   importFrom?: string;
   importTo?: string;
   replaceWith?: {
@@ -32,7 +31,7 @@ export type RemapFile<O extends RuleMatch, N extends RuleSet> = {
 
 export const basePropsRemap = <O extends RuleMatch, N extends RuleSet>(
   pks: string[],
-  components: Record<string, RemapRule<O, N>[]>[],
+  components: Record<string, RemapRule<O, N>[]>[]
 ): RemapFile<O, N> => {
   const remapRules: RemapFile<O, N> = {};
 
@@ -41,7 +40,7 @@ export const basePropsRemap = <O extends RuleMatch, N extends RuleSet>(
     components.forEach((comp) => {
       Object.entries(comp).forEach(([compName, rules]) => {
         remapRules[pkg][compName] = rules.map((r) =>
-          r.importFrom ? { ...r, importFrom: pkg } : r,
+          r.importFrom ? { ...r, importFrom: pkg } : r
         );
       });
     });

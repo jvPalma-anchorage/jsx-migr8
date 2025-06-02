@@ -18,7 +18,7 @@ const importStmMapper = Object.keys(imp).length > 0 ? {} : {};
 
 const mapper = (
   type?: OldTypes,
-  size?: OldSizes,
+  size?: OldSizes
 ): RemapRule<Old, New> | null => {
   const match: any = {};
   const findOldProps: {
@@ -43,8 +43,8 @@ const mapper = (
       // );
       console.warn(
         `Invalid type prop value: "${type}". Valid values are: ${oldTypes.join(
-          ", ",
-        )}.`,
+          ", "
+        )}.`
       );
     }
   }
@@ -60,8 +60,8 @@ const mapper = (
       // );
       console.warn(
         `Invalid type prop value: "${type}". Valid values are: ${oldTypes.join(
-          ", ",
-        )}.`,
+          ", "
+        )}.`
       );
     }
   }
@@ -69,6 +69,7 @@ const mapper = (
   const hasVariant = commonToLatitude[findOldProps.type]?.[findOldProps.size];
   if (hasVariant) {
     return {
+      order: 999,
       match: [match],
       set: {
         variant: hasVariant,
@@ -106,7 +107,7 @@ export const remapperOld = (PACKAGES: string[]): RemapFile<Old, New> => {
 
 export const remapper = (
   pkg: string,
-  compName: string,
+  compName: string
 ): RemapRule<Old, New>[] => {
   // * DIRECT PROP REPLACEMENT
 
@@ -115,8 +116,58 @@ export const remapper = (
       ({
         ...rule,
         importFrom: pkg,
-      }) as RemapRule<Old, New>,
+      }) as RemapRule<Old, New>
   );
 
   return rules;
 };
+
+(() => {
+  const variants = {};
+
+  let counter = 11;
+
+  const rules = [
+    //  ? all scenarios where
+    //      * Size SET
+    //      ! Type = default
+    ...oldSizes.map((size) => ({ size })),
+    //  ? all scenarios where
+    //      ! Size = DETAULT
+    //      * Type SET
+    ...oldTypes.map((type) => ({ type })),
+    //  ? all scenarios where
+    //      * Size SET
+    //      * Type SET
+    ...oldTypes.map((type) => oldSizes.map((size) => ({ size, type }))).flat(),
+  ].forEach(({ type, size }) => {
+    const rule = mapper(type, size);
+    if (!rule) return;
+
+    if (!!variants[rule.set?.variant!]?.length) {
+      variants[rule.set?.variant!].push(rule.match[0]);
+    } else {
+      variants[rule.set?.variant!] = rule.match;
+    }
+  });
+
+  Object.entries(variants).forEach(([variant, match]) => {
+    [
+      "@anchorage/common/dist/components/Text",
+      "@anchorage/common/dist/components",
+    ].forEach((pkg) => {
+      console.log({
+        order: counter++,
+        match: match,
+        remove: ["tag", "type", "size"],
+        set: {
+          variant,
+        },
+        importFrom: pkg,
+        importTo: "@latitude/text",
+      });
+    });
+  });
+
+  // console.dir(variants, { depth: null });
+})();

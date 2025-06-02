@@ -25,8 +25,8 @@ export const commonToLatitude: {
     tiny: "bodyMedium", //! NO DIRECT MATCH
   },
   link: {
-    medium: "link", //! NO DIRECT MATCH
-    tiny: "link", //! NO DIRECT MATCH
+    medium: "linkStandalone", //! NO DIRECT MATCH
+    tiny: "linkStandalone", //! NO DIRECT MATCH
   },
   metric: {
     large: "metricHuge",

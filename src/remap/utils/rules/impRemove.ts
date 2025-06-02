@@ -1,5 +1,5 @@
 import { types as T, print, visit } from "recast";
-import { MigrationMapper } from "../../../migrator";
+import { MigrationMapper } from "../../../migrator/types";
 
 export const impRemove = (
   ast: T.ASTNode,
@@ -27,6 +27,8 @@ export const impRemove = (
             (sp.imported as any).name === migrationObj.importNode.localName
           ),
       );
+      // import { A } from "asjdhgbvashjdb "
+      // import "asjdhgbvashjdb "
 
       // 2. if spec list empty remove whole import
       if (!decl.specifiers?.length) {
