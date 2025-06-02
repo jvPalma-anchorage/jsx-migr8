@@ -32,14 +32,24 @@
 git clone git@github.com:jvPalma-anchorage/jsx-migr8.git
 cd jsx-migr8
 yarn          # or npm install / pnpm i
+```
 
+```bash
+# configure env variables
+mv .env.example .env      # launches the interactive menu
+code
+```
+
+```bash
 # run the wizard
 yarn start      # launches the interactive menu
 
 # generate reports
 # (option appears in the menu after the wizard)
 # ...
+```
 
+```bash
 # dry-run migration with coloured diffs
 yarn dry-run
 
