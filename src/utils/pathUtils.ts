@@ -31,3 +31,17 @@ export const getFileCode = (filePath: string): [T.ASTNode, string] => {
 
   return [ast, origCode];
 };
+
+export const getCompName = (
+  local: string,
+  imported: string | undefined,
+  type: string | undefined
+) => {
+  if (!imported && !type) {
+    return local;
+  }
+  if (type && type === "default") {
+    return local;
+  }
+  return imported || local;
+};

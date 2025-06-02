@@ -23,7 +23,7 @@ export function makeDiff(
   filePath: string,
   oldCode: string,
   newCode: string,
-  contextLines = 2,
+  contextLines = 2
 ): string {
   const patch = structuredPatch(
     filePath, // old filename (only used for header)
@@ -32,7 +32,7 @@ export function makeDiff(
     newCode,
     "", // old header
     "", // new header
-    { context: contextLines }, // ✨ keep N lines of ctx
+    { context: contextLines } // ✨ keep N lines of ctx
   );
 
   const lines: string[] = [];
@@ -40,8 +40,8 @@ export function makeDiff(
     // header like @@ -12,7 +12,7 @@
     lines.push(
       chalk.cyan(
-        `@@ -${h.oldStart},${h.oldLines} +${h.newStart},${h.newLines} @@`,
-      ),
+        `@@ -${h.oldStart},${h.oldLines} +${h.newStart},${h.newLines} @@`
+      )
     );
 
     h.lines.forEach((l) => {
@@ -53,5 +53,5 @@ export function makeDiff(
     });
   });
 
-  return lines.join("\n") + "\n\n";
+  return [chalk.yellowBright(filePath), ...lines].join("\n") + "\n\n";
 }

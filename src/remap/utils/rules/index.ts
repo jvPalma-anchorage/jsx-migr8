@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import { print, visit } from "recast";
-import { getContext, lError } from "../../../context/globalContext";
+import { getContext, lWarning } from "../../../context/globalContext";
 import { MigrationMapper } from "../../../migrator/types";
+import { getCompName } from "../../../utils/pathUtils";
 import { RemapRule } from "../../base-remapper";
 import { impRemove } from "./impRemove";
 import { impSet } from "./impSet";
@@ -10,13 +11,12 @@ import { propSet } from "./propSet";
 import { handleReplaceWithJsx } from "./replaceWithJsx";
 import { getRuleMatch } from "./ruleMatch";
 
-
-
 export const applyRemapRule = (
   changeCode: boolean,
   [filePath, migrationObj]: [string, MigrationMapper[string]]
 ) => {
   const { compSpec } = getContext();
+  let errorOnMigr8FileLoad = false;
   let mutated = false;
   const changed = () => {
     mutated = true;
@@ -24,20 +24,29 @@ export const applyRemapRule = (
 
   let rules: RemapRule<any, any>[] = [];
 
-  const migr8FilePath = `./migr8Rules/${migrationObj.compName}-to-${compSpec!.new.compName}-migr8.json`;
+  const locName = getCompName(
+    migrationObj.importNode.localName,
+    migrationObj.importNode.importedName,
+    migrationObj.importNode.importType
+  );
+  const migr8FilePath = `./migr8Rules/${locName}-to-${compSpec!.new.compName}-migr8.json`;
 
   try {
     rules = JSON.parse(fs.readFileSync(migr8FilePath, "utf8"))[
-      migrationObj.compName
-    ];
+      migrationObj.pkg
+    ][locName];
   } catch (_error) {
-    lError("Loading Migr8 File", `could not find file ${migr8FilePath}`);
-
-    process.exit(0);
+    lWarning(
+      "Loading Migr8 File",
+      `could not find file ${migr8FilePath}, or missing definition on 📦 ${migrationObj.pkg} or its component 🧩 ${locName}`
+    );
+    errorOnMigr8FileLoad = true;
   }
 
-  if (!rules || rules.length) {
-    lError("No rules", `could not find any rules in ${migr8FilePath}`);
+  if (!rules || rules.length === 0) {
+    !errorOnMigr8FileLoad &&
+      lWarning("No rules", `could not find any rules in ${migr8FilePath}`);
+    return mutated;
   }
   const toPrune: Set<string> = new Set();
 
@@ -59,7 +68,7 @@ export const applyRemapRule = (
       handleReplaceWithJsx(changeCode, {
         rule: rule as any, // this is OK, im tired.
         elem,
-        compName: migrationObj.compName,
+        compName: locName,
         filePath,
       });
 
@@ -103,20 +112,17 @@ export const applyRemapRule = (
     // ** ------ Migrate [ IMPORT STATEMENTS] --------------------------- */
     if (rule.importFrom && rule.importTo) {
       changed();
+
       const pruneImport = impRemove(
         migrationObj.codeCompare?.ast!,
         migrationObj
       );
+
       if (!!pruneImport) {
         toPrune.add(pruneImport);
       }
 
-      impSet(
-        migrationObj.codeCompare?.ast!,
-        migrationObj.importNode.importedName ||
-          migrationObj.importNode.localName,
-        rule.importTo
-      );
+      impSet(migrationObj.codeCompare?.ast!, locName, rule.importTo);
     }
   });
 

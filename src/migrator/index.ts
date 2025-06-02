@@ -10,6 +10,7 @@ import chalk from "chalk";
 import { getContext, lSuccess } from "../context/globalContext";
 import { applyRemapRule } from "../remap/utils/rules";
 import { makeDiff } from "../utils/diff";
+import { getCompName } from "../utils/pathUtils";
 import { prepareReportToMigrate } from "./utils/prepareReportToMigrate";
 
 export const migrateComponents = async (changeCode = false) => {
@@ -19,6 +20,7 @@ export const migrateComponents = async (changeCode = false) => {
   }
   const migrationMapper = prepareReportToMigrate(PACKAGES, report);
   const successMigrated: string[] = [];
+  const couldMigrate: string[] = [];
 
   Object.entries(migrationMapper).forEach((migrationObj) => {
     const changed = applyRemapRule(changeCode, migrationObj);
@@ -26,7 +28,13 @@ export const migrateComponents = async (changeCode = false) => {
       return;
     }
     const [filePath, fileCompleteData] = migrationObj;
-    const { codeCompare, elements, compName } = fileCompleteData;
+    const { codeCompare, elements, importNode } = fileCompleteData;
+
+    const locName = getCompName(
+      importNode.localName,
+      importNode.importedName,
+      importNode.importType
+    );
 
     // const filePath = fileCompleteData.importNode.filePath;
     const oldCode = codeCompare!.old || "1 N/A";
@@ -40,15 +48,31 @@ export const migrateComponents = async (changeCode = false) => {
           " (",
           chalk.yellow(elements.length),
           ") ",
-          chalk.yellow(compName),
+          chalk.yellow(locName),
           " in ",
           chalk.yellow(filePath),
         ].join("")
       );
     } else {
+      couldMigrate.push(
+        [
+          "would migrate",
+          chalk.yellow(locName),
+          " in ",
+          chalk.yellow(filePath),
+        ].join("")
+      );
+
       console.info("🎉", makeDiff(filePath, oldCode, newCode, 2));
     }
   });
+
+  if (!changeCode) {
+    couldMigrate.forEach((e) => {
+      const str = e.split(" migrate");
+      lSuccess(str[0] + " migrate", str[1]);
+    });
+  }
 
   if (changeCode || runArgs.debug) {
     successMigrated.forEach((e) => {

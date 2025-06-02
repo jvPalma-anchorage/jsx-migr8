@@ -3,10 +3,14 @@ import { MigrationMapper } from "../../../migrator/types";
 
 export const impRemove = (
   ast: T.ASTNode,
-  migrationObj: MigrationMapper[string],
+  migrationObj: MigrationMapper[string]
 ) => {
   const toPrune: string[] = [];
   const lookupPkg = migrationObj.pkg;
+
+  const { localName, importedName, importType } = migrationObj.importNode;
+
+  const compLookupName = importType === "default" ? importedName : localName;
 
   let counter = 0;
   visit(ast, {
@@ -20,15 +24,39 @@ export const impRemove = (
       if (src !== lookupPkg) return false;
 
       // 1. drop current specifier
-      decl.specifiers = decl.specifiers?.filter(
-        (sp) =>
-          !(
-            sp.type === "ImportSpecifier" &&
-            (sp.imported as any).name === migrationObj.importNode.localName
-          ),
-      );
-      // import { A } from "asjdhgbvashjdb "
-      // import "asjdhgbvashjdb "
+      decl.specifiers = decl.specifiers?.filter((sp) => {
+        const specLocName = (sp as any).local.name as string;
+
+        if (sp.type === "ImportSpecifier" && importType === "named") {
+          // console.log("==========================", {
+          //   //* specImpName: 'Text',
+          //   specImpName: (sp.imported as any).name,
+          //   //? specLocName: 'Text',
+          //   specLocName,
+          //   //* localName: 'Text',
+          //   localName,
+          //   //? importedName: 'Text',
+          //   importedName,
+          //   //? importType: 'named'
+          //   importType,
+          // });
+          return (sp.imported as any).name !== compLookupName;
+        }
+        if (sp.type === "ImportDefaultSpecifier" && importType === "default") {
+          // console.log("==========================", {
+          //*   // specLocName: 'Text',
+          //   specLocName,
+          //*   // localName: 'Text',
+          //   localName,
+          //?   // importedName: 'default',
+          //   importedName,
+          //?   // importType: 'default'
+          //   importType,
+          // });
+          return specLocName !== localName;
+        }
+        return true;
+      });
 
       // 2. if spec list empty remove whole import
       if (!decl.specifiers?.length) {
