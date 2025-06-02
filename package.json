@@ -1,0 +1,66 @@
+{
+  "name": "jsx-migr8",
+  "version": "1.0.0",
+  "description": "Interactive CLI that scans a code-base, analyses JSX component usage and applies codemod-level migrations with preview/diff tooling.",
+  "author": "João Vieira Palma <joaovieirapalma@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jvPalma-anchorage/jsx-migr8.git"
+  },
+  "homepage": "https://github.com/jvPalma-anchorage/jsx-migr8#readme",
+  "bugs": {
+    "url": "https://github.com/jvPalma-anchorage/jsx-migr8/issues"
+  },
+  "keywords": [
+    "codemod",
+    "jsx",
+    "react",
+    "migration",
+    "cli",
+    "ast",
+    "recast",
+    "typescript"
+  ],
+  "packageManager": "yarn@4.2.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "tsx src/cli/index.ts",
+    "clean": "rm -f ./queue/props-usage.json && rm -f ./queue/usage.json",
+    "deep-clean": "yarn clean && rm -f ./queue/component-spec.json",
+    "dev": "yarn start",
+    "dry-run": "yarn start --dry-run",
+    "yolo": "yarn start --yolo",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write .",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "@babel/core": "7.24.0",
+    "@babel/preset-react": "7.24.3",
+    "@babel/preset-typescript": "7.24.0",
+    "@inquirer/prompts": "7.5.3",
+    "dotenv": "16.3.1",
+    "fast-glob": "3.3.3",
+    "jscodeshift": "17.3.0",
+    "recast": "0.23.5",
+    "yargs": "17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.7",
+    "@types/yargs": "17.0.32",
+    "chalk": "5.4.1",
+    "diff": "8.0.2",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "prettier": "3.3.3",
+    "ts-node": "10.9.2",
+    "tsup": "8.0.3",
+    "tsx": "4.7.0",
+    "typescript": "5.4.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
