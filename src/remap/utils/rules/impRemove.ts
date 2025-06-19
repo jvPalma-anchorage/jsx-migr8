@@ -3,7 +3,7 @@ import { MigrationMapper } from "../../../migrator/types";
 
 export const impRemove = (
   ast: T.ASTNode,
-  migrationObj: MigrationMapper[string]
+  migrationObj: MigrationMapper[string],
 ) => {
   const toPrune: string[] = [];
   const lookupPkg = migrationObj.pkg;

@@ -40,8 +40,8 @@ const mapper = (type?: OldTypes, size?: OldSizes): RemapRule | null => {
       // );
       console.warn(
         `Invalid type prop value: "${type}". Valid values are: ${oldTypes.join(
-          ", "
-        )}.`
+          ", ",
+        )}.`,
       );
     }
   }
@@ -57,8 +57,8 @@ const mapper = (type?: OldTypes, size?: OldSizes): RemapRule | null => {
       // );
       console.warn(
         `Invalid type prop value: "${type}". Valid values are: ${oldTypes.join(
-          ", "
-        )}.`
+          ", ",
+        )}.`,
       );
     }
   }
@@ -110,7 +110,7 @@ export const remapper = (pkg: string, compName: string): RemapRule[] => {
       ({
         ...rule,
         importFrom: pkg,
-      }) as RemapRule
+      }) as RemapRule,
   );
 
   return rules;

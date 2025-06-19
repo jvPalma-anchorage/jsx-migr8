@@ -53,6 +53,12 @@ __debug_bin
 node_modules/
 queue/
 yarn-error.log
+
+# jsx-migr8 backup system
+.migr8-backups/
+*.migr8-backup
+*.migr8-restore-*
+backup-*.tar.gz
 # yarn
 .yarn/cache
 .yarn/install-state.gz

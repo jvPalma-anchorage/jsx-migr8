@@ -6,11 +6,11 @@ import type { ComponentUsage, JSXPath } from "../types";
 import { getPropValue } from "../utils/props";
 
 /** Analyze one JSXElement and push data to context.report */
-export function analyzeJSXElement(
+export const analyzeJSXElement = (
   p: JSXPath,
   fileAbsPath: string,
-  isMigrating: [string, string, ImportUsage]
-) {
+  isMigrating: [string, string, ImportUsage],
+) => {
   const { ROOT_PATH, TARGET_COMPONENT, report } = getContext();
 
   // * file path -> code node
@@ -78,4 +78,4 @@ export function analyzeJSXElement(
     props: componentUsage.props,
     compUsage: componentUsage,
   };
-}
+};

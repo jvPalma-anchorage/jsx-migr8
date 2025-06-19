@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 /* ------------------------------------------------------------------------- */
 /*  Single-pass migrate + dry-run diff                                       */
 /* ------------------------------------------------------------------------- */
@@ -8,13 +8,14 @@ import { print } from "recast";
 import { getMigr8RulesFileNames } from "@/utils/fs-utils";
 import { transformFileIntoOptions } from "@/utils/migr8.utils";
 import { input, select } from "@inquirer/prompts";
-import chalk from "chalk";
+import { default as chalk } from "chalk";
 import { graphToComponentSummary } from "../compat/usageSummary";
 import { getContext, lSuccess } from "../context/globalContext";
 import { applyRemapRule } from "../remap/utils/rules";
 import { makeDiff } from "../utils/diff";
 import { getCompName } from "../utils/pathUtils";
 import { prepareReportToMigrate } from "./utils/prepareReportToMigrate";
+import { migrateComponentsWithBackup } from "../backup/migrator-integration";
 
 export const migrateComponents = async (changeCode = false) => {
   const { runArgs, graph } = getContext();
@@ -43,6 +44,27 @@ Please create one in "🔍  Inspect components"`;
 
   const migrationMapper = prepareReportToMigrate(migr8Spec, summary);
 
+  // Check if backup integration should be used
+  const shouldSkipBackup = runArgs.skipBackup;
+  const isYoloMode = runArgs.yolo || changeCode;
+
+  // Use enhanced migration with backup integration unless specifically skipped
+  if (!shouldSkipBackup && (isYoloMode || !runArgs.dryRun)) {
+    try {
+      await migrateComponentsWithBackup(migrationMapper, migr8Spec, changeCode);
+      return;
+    } catch (error) {
+      console.warn(
+        chalk.yellow(
+          "⚠️  Backup integration failed, falling back to standard migration:",
+        ),
+        error,
+      );
+      // Fall through to standard migration
+    }
+  }
+
+  // Standard migration logic (kept for backward compatibility and fallback)
   const successMigrated: string[] = [];
   const couldMigrate: string[] = [];
 
@@ -57,7 +79,7 @@ Please create one in "🔍  Inspect components"`;
     const locName = getCompName(
       importNode.local,
       importNode.imported,
-      importNode.importedType
+      importNode.importedType,
     );
 
     // const fileAbsPath = fileCompleteData.importNode.fileAbsPath;
@@ -65,7 +87,7 @@ Please create one in "🔍  Inspect components"`;
     const newCode = print(codeCompare.ast!).code || "2 N/A";
 
     if (changeCode) {
-      fs.writeFileSync(fileAbsPath, newCode);
+      writeFileSync(fileAbsPath, newCode);
       successMigrated.push(
         [
           "migrated",
@@ -75,7 +97,7 @@ Please create one in "🔍  Inspect components"`;
           chalk.yellow(locName),
           " in ",
           chalk.yellow(fileAbsPath),
-        ].join("")
+        ].join(""),
       );
     } else {
       couldMigrate.push(
@@ -84,7 +106,7 @@ Please create one in "🔍  Inspect components"`;
           chalk.yellow(locName),
           " in ",
           chalk.yellow(fileAbsPath),
-        ].join("")
+        ].join(""),
       );
 
       console.info("🎉", makeDiff(fileAbsPath, oldCode, newCode, 2));
@@ -127,7 +149,7 @@ Please create one in "🔍  Inspect components"`;
   if (action === "migrate") {
     const confirm = await input({
       message: chalk.redBright(
-        "This will MODIFY your files - type 'yes' to continue:"
+        "This will MODIFY your files - type 'yes' to continue:",
       ),
     });
     if (confirm.trim().toLowerCase() === "yes") {

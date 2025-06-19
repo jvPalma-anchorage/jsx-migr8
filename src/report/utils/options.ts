@@ -4,7 +4,7 @@ import { filterWhiteListedProps } from "./props";
 
 /** Given the usages, returns the package options array (first SELECT) */
 export const buildPkgOptions = (
-  summary: ComponentPropsSummary
+  summary: ComponentPropsSummary,
 ): OptionValue[] => {
   const pkgOptions: OptionValue[] = [];
 

@@ -10,13 +10,13 @@ import { MigrationMapper } from "../types";
 
 export const prepareReportToMigrate = (
   migr8Spec: Migr8Spec,
-  summary: ComponentPropsSummary
+  summary: ComponentPropsSummary,
 ) => {
   const { graph } = getContext();
 
   if (!graph) {
     throw new Error(
-      "Graph is not available. Please ensure it is built before calling this function."
+      "Graph is not available. Please ensure it is built before calling this function.",
     );
   }
   const migrationMapper: MigrationMapper = {};
@@ -47,7 +47,7 @@ export const prepareReportToMigrate = (
         const validName = getCompName(
           compUsage.impObj.local,
           compUsage.impObj.imported,
-          compUsage.impObj.importedType
+          compUsage.impObj.importedType,
         );
 
         migrationMapper[fileAbsPath] = {

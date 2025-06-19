@@ -1,11 +1,11 @@
-import chalk from "chalk";
+import { default as chalk } from "chalk";
 import { structuredPatch } from "diff";
 
 /**
  * Remove “blank” +/- lines from a unified diff string.
  * A blank +/- line is literally “+” or “-” followed only by spaces / tabs.
  */
-export function stripBlankMoves(diffText: string): string {
+export const stripBlankMoves = (diffText: string): string => {
   return diffText
     .split("\n")
     .filter((line) => {
@@ -17,14 +17,14 @@ export function stripBlankMoves(diffText: string): string {
       return true; // context, @@ headers, etc.
     })
     .join("\n");
-}
+};
 
-export function makeDiff(
+export const makeDiff = (
   filePath: string,
   oldCode: string,
   newCode: string,
-  contextLines = 2
-): string {
+  contextLines = 2,
+): string => {
   const patch = structuredPatch(
     filePath, // old filename (only used for header)
     filePath, // new filename
@@ -32,7 +32,7 @@ export function makeDiff(
     newCode,
     "", // old header
     "", // new header
-    { context: contextLines } // ✨ keep N lines of ctx
+    { context: contextLines }, // ✨ keep N lines of ctx
   );
 
   const lines: string[] = [];
@@ -40,8 +40,8 @@ export function makeDiff(
     // header like @@ -12,7 +12,7 @@
     lines.push(
       chalk.cyan(
-        `@@ -${h.oldStart},${h.oldLines} +${h.newStart},${h.newLines} @@`
-      )
+        `@@ -${h.oldStart},${h.oldLines} +${h.newStart},${h.newLines} @@`,
+      ),
     );
 
     h.lines.forEach((l) => {
@@ -54,4 +54,11 @@ export function makeDiff(
   });
 
   return [chalk.yellowBright(filePath), ...lines].join("\n") + "\n\n";
-}
+};
+
+/**
+ * Display a diff between old and new code
+ */
+export const showDiff = (oldCode: string, newCode: string): string => {
+  return makeDiff("", oldCode, newCode);
+};

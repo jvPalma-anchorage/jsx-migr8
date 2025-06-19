@@ -10,7 +10,7 @@ import { getRuleMatch } from "./ruleMatch";
 export const applyRemapRule = (
   changeCode: boolean,
   [fileAbsPath, migrationObj]: [string, MigrationMapper[string]],
-  migr8Specs: Migr8Spec
+  migr8Specs: Migr8Spec,
 ) => {
   const { graph } = getContext();
 
@@ -22,13 +22,13 @@ export const applyRemapRule = (
   const spec = migr8Specs.migr8rules.find(
     (r) =>
       r.package === migrationObj.packageName &&
-      r.component === migrationObj.component
+      r.component === migrationObj.component,
   );
 
   if (!spec) {
     lWarning(
       "No migr8 rule found",
-      `for ${migrationObj.packageName} - ${migrationObj.component}`
+      `for ${migrationObj.packageName} - ${migrationObj.component}`,
     );
     return false;
   }
@@ -69,7 +69,7 @@ export const applyRemapRule = (
         propRemove(opener, propToRemove);
         mutated &&
           console.log(
-            `Removed prop "${propToRemove}" from ${locName} in ${fileAbsPath}`
+            `Removed prop "${propToRemove}" from ${locName} in ${fileAbsPath}`,
           );
       });
     }
@@ -84,7 +84,7 @@ export const applyRemapRule = (
         }
         mutated &&
           console.log(
-            `Renamed prop "${from}" to "${to}" in ${locName} in ${fileAbsPath}`
+            `Renamed prop "${from}" to "${to}" in ${locName} in ${fileAbsPath}`,
           );
       });
     }
@@ -95,7 +95,7 @@ export const applyRemapRule = (
         propSet(opener, k, v);
         mutated &&
           console.log(
-            `Set prop "${k}" to "${v}" in ${locName} in ${fileAbsPath}`
+            `Set prop "${k}" to "${v}" in ${locName} in ${fileAbsPath}`,
           );
       });
     }

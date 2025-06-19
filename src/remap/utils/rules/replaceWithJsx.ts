@@ -29,7 +29,7 @@ type PropAndRule = {
 };
 export const handleReplaceWithJsx = (
   changeCode: boolean,
-  { rule, elem, compName, filePath }: PropAndRule
+  { rule, elem, compName, filePath }: PropAndRule,
 ) => {
   const {
     set,
@@ -74,7 +74,7 @@ export const handleReplaceWithJsx = (
 
   Object.keys(elemProps).forEach((key) => {
     const propAsJsxAttr = existingPropsAsJSXAttr.find(
-      (propAsJsxAttr) => Object.entries(propAsJsxAttr)[0][0] === key
+      (propAsJsxAttr) => Object.entries(propAsJsxAttr)[0][0] === key,
     )!;
 
     const jsxAttr = Object.entries(propAsJsxAttr)[0][1];

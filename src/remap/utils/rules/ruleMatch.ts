@@ -1,19 +1,18 @@
 import { JsxUsage } from "@/graph/types";
 import { RemapRule } from "@/remap/base-remapper";
-import { lWarning } from "../../../context/globalContext";
 
 export const matchesRule = (
-  propsNow: JsxUsage["props"],
-  matchArr: Record<string, any>[] = []
+  propsNow: Record<string, string>,
+  matchArr: Record<string, any>[] = [],
 ): boolean => {
   if (matchArr.length === 0) return true; // no conditions → always match
 
   // split into “positive” and “negative” objects
   const positives = matchArr.filter(
-    (obj) => !Object.keys(obj).some((k) => k.startsWith("!"))
+    (obj) => !Object.keys(obj).some((k) => k.startsWith("!")),
   );
   const negatives = matchArr.filter((obj) =>
-    Object.keys(obj).some((k) => k.startsWith("!"))
+    Object.keys(obj).some((k) => k.startsWith("!")),
   );
 
   /* ---------- helpers ---------- */
@@ -62,7 +61,7 @@ export const matchesRule = (
  */
 export const getRuleMatch = (
   rules: RemapRule[],
-  propsNow: JsxUsage["props"]
+  propsNow: Record<string, string>,
 ) => {
   // TODO: REPLACE THIS OLD FILE LOGIC TO MATCH THE NEW MIGR8 RULES
   const rule = rules.find((r) => matchesRule(propsNow, r.match));
@@ -71,9 +70,5 @@ export const getRuleMatch = (
     return rule;
   }
 
-  if (false) {
-    lWarning(`No rule found for \n${JSON.stringify(propsNow, null, 2)} in`);
-    return undefined;
-  }
   return undefined;
 };

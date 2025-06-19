@@ -1,9 +1,9 @@
-import chalk from "chalk";
+import { default as chalk } from "chalk";
 
 export const printTotalProps = (
   keys: Record<string, string[]>,
   packageToScan: string,
-  selectedComponent: string
+  selectedComponent: string,
 ): [string[], string] => {
   const propsOrderedByUsage: string[] = [];
   const printLines = [
@@ -17,7 +17,7 @@ export const printTotalProps = (
       propsOrderedByUsage.push(propKey);
 
       printLines.push(
-        `${chalk.blueBright("Prop:")} ${chalk.whiteBright(propKey.padEnd(16))} ${chalk.greenBright(`${values.length}x`)}`
+        `${chalk.blueBright("Prop:")} ${chalk.whiteBright(propKey.padEnd(16))} ${chalk.greenBright(`${values.length}x`)}`,
       );
     });
 

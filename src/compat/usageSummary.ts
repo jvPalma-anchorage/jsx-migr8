@@ -13,7 +13,7 @@ export function graphToComponentSummary(graph: ProjectGraph) {
 
     const item: ComponentUsage = {
       props: Object.fromEntries(
-        Object.entries(j.props).map(([k, v]) => [k, getPropValue(v)]) // old behaviour
+        Object.entries(j.props).map(([k, v]) => [k, getPropValue(v)]), // old behaviour
       ),
       impObj: j.importRef,
       originalProps: {},

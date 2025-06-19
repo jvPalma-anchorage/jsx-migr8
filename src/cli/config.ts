@@ -1,8 +1,8 @@
-import dotenv from "dotenv";
-import yargs from "yargs";
+import { config } from "dotenv";
+import { default as yargs } from "yargs";
 import { hideBin } from "yargs/helpers";
 
-dotenv.config();
+config();
 
 export const argv = yargs(hideBin(process.argv))
   .option("root", {
@@ -56,6 +56,47 @@ export const argv = yargs(hideBin(process.argv))
     type: "boolean",
     default: false,
     describe: "Show internal states during the process",
+  })
+  .option("backup", {
+    type: "boolean",
+    default: false,
+    describe: "Launch backup management UI",
+  })
+  .option("rollback", {
+    type: "string",
+    describe: "Rollback to specified backup ID (interactive if no ID provided)",
+  })
+  .option("listBackups", {
+    type: "boolean",
+    default: false,
+    describe: "List all available backups",
+  })
+  .option("verifyBackup", {
+    type: "string",
+    describe: "Verify integrity of specified backup",
+  })
+  .option("cleanupBackups", {
+    type: "boolean",
+    default: false,
+    describe: "Clean up old backups",
+  })
+  .option("skipBackup", {
+    type: "boolean",
+    default: false,
+    describe: "Skip automatic backup creation during migration",
+  })
+  .option("backupName", {
+    type: "string",
+    describe: "Name for manual backup creation",
+  })
+  .option("backupTags", {
+    type: "string",
+    describe: "Comma-separated tags for backup",
+  })
+  .option("forceRollback", {
+    type: "boolean",
+    default: false,
+    describe: "Force rollback even with conflicts",
   })
   .strict()
   .parseSync();

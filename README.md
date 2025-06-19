@@ -126,8 +126,6 @@ src/
 
 Enjoy & happy migrating! 🎉
 
-
-
 # 🚚 **jsx-migr8**
 
 ---
@@ -137,11 +135,11 @@ Enjoy & happy migrating! 🎉
 ### Why we built it – the never-ending **Common → Latitude** migration
 
 Anchorage’s front-end still contains thousands of `<Text>` and other design-system components imported from `@anchorage/common`.
-Maintaining *two* DS packages forces every feature team to:
+Maintaining _two_ DS packages forces every feature team to:
 
-* scan huge codebases to discover what still lives in **Common**
-* hand-convert dozens of subtle prop/variant changes (often by search-and-replace 😱)
-* run risky “big-bang” PRs that break styling or behaviour
+- scan huge codebases to discover what still lives in **Common**
+- hand-convert dozens of subtle prop/variant changes (often by search-and-replace 😱)
+- run risky “big-bang” PRs that break styling or behaviour
 
 The pain is time, risk and developer frustration.
 
@@ -151,16 +149,16 @@ The pain is time, risk and developer frustration.
 
 1. **Scans** the whole repo on every run → an always-fresh graph of imports and JSX usage.
 2. **Shows** prop statistics in a friendly table so teams can pick what matters.
-3. **Generates** machine-readable migration specs (*Migr8Spec*) instead of ad-hoc scripts.
+3. **Generates** machine-readable migration specs (_Migr8Spec_) instead of ad-hoc scripts.
 4. **Transforms & commits** code with AST-aware rules, preserving formatting and complex expressions.
 
-Result: repeatable, reviewable, *safe* migrations that scale with the design-system roadmap.
+Result: repeatable, reviewable, _safe_ migrations that scale with the design-system roadmap.
 
 ---
 
 ## Milestones & tasks
 
-Below is a Linear-ready break-down.  Each bullet is a task; indentations are sub-tasks where helpful.
+Below is a Linear-ready break-down. Each bullet is a task; indentations are sub-tasks where helpful.
 
 ---
 
@@ -178,89 +176,74 @@ Below is a Linear-ready break-down.  Each bullet is a task; indentations are sub
 
 ### 🎉 **Release 1.0 – “The Wizard era”**
 
+**Queue folder bootstrap**  
+ Create `./queue/` with `component-spec.json` scaffold on first run.
 
-**Queue folder bootstrap**            
-     Create `./queue/` with `component-spec.json` scaffold on first run.                
+Interactive **Wizard CLI**  
+ Step-by-step prompts to fill `component-spec.json` (old & new import, alias type).
 
+Generate stub **Migr8Rule** JSON  
+ Write `migr8Rules/<old>-to-<new>.json` with `TODO:` markers.
 
-Interactive **Wizard CLI**            
-     Step-by-step prompts to fill `component-spec.json` (old & new import, alias type). 
+Props scanner & frequency table  
+ Analyse selected component, show combinations + counts.
 
+Colourised **diff preview**  
+ Git-style output with context lines for every file to be changed.
 
-Generate stub **Migr8Rule** JSON      
-     Write `migr8Rules/<old>-to-<new>.json` with `TODO:` markers.                       
+`--dryRun` / `--yolo` flags  
+ Choice between preview-only and in-place file rewrite (with backup).
 
+Basic logging helper  
+ Consistent `INFO / WARN / SUCS` prefixes; quiet by default.
 
-Props scanner & frequency table       
-     Analyse selected component, show combinations + counts.                            
+CLI flags (`root`, `blacklist`, etc.)
+Configurable without editing code.
 
+Named vs default import handling  
+ Correctly map `import Text` _and_ `import { Text }` forms.
 
-Colourised **diff preview**           
-     Git-style output with context lines for every file to be changed.                  
+Example rule: **Text-to-Text**  
+ Production-ready JSON used by Design-System team.
 
+Unit tests for utils  
+ Jest coverage for diff maker, path helpers, loggers.
 
-`--dryRun` / `--yolo` flags           
-     Choice between preview-only and in-place file rewrite (with backup).               
-
-
-Basic logging helper                  
-     Consistent `INFO / WARN / SUCS` prefixes; quiet by default.                        
-
-
-CLI flags (`root`, `blacklist`, etc.) 
-     Configurable without editing code.                                                 
-
-
-Named vs default import handling      
-     Correctly map `import Text` *and* `import { Text }` forms.                         
-
-
-Example rule: **Text-to-Text**        
-     Production-ready JSON used by Design-System team.                                  
-
-
-Unit tests for utils                  
-     Jest coverage for diff maker, path helpers, loggers.                               
-
-
-Publish **v1.0.0** & docs             
-     Tagged release, README update and internal demo.                                   
-
-
+Publish **v1.0.0** & docs  
+ Tagged release, README update and internal demo.
 
 ---
 
-### 🚀 **Release 2.0 – Graph & Spec renaissance**  *(current)*
+### 🚀 **Release 2.0 – Graph & Spec renaissance** _(current)_
 
+- **Graph builder** replaces old reports
+  - Always scan on start → `graph.jsx` & `graph.imports`, no stale JSON.
+- Remove Wizard; new **dependency-first CLI**
+  - Scan → choose packages/components interactively → no more manual folder editing.
+- New **`Migr8Spec` schema**
+  - Single file holds `lookup` + multiple component rule-blocks; loader with CLI precedence.
+- Multi-package/component prop tables
+  - Allow selecting many packages & comps, show individual prop tables.
+- **Migration engine** consumes `Migr8Spec.rules[]`
+  - Adapt rule-matcher, import-rewriter, diff printer to new data-model.
+- Preserve original **value node types**
+  - `rename` / `set` keep AST (`CallExpression`, etc.), not strings.
+- Support `renameSpecifiers` & `dropSpecifiers`
+  - Enables package-wide icon migration; implement with Icons example.
+- Improved diff UX & flow
+  - Select spec → dry-run preview per file → confirm → mutate; collapsible diffs.
+- Remove legacy code & JSONs
+  - Delete `reportGlobalUsage`, wizard modules; optional `graph.json` export only.
 
-- **Graph builder** replaces old reports            
-  - Always scan on start → `graph.jsx` & `graph.imports`, no stale JSON.                     
-- Remove Wizard; new **dependency-first CLI**       
-  - Scan → choose packages/components interactively → no more manual folder editing.         
-- New **`Migr8Spec` schema**                        
-  - Single file holds `lookup` + multiple component rule-blocks; loader with CLI precedence. 
-- Multi-package/component prop tables               
-  - Allow selecting many packages & comps, show individual prop tables.                      
-- **Migration engine** consumes `Migr8Spec.rules[]` 
-  - Adapt rule-matcher, import-rewriter, diff printer to new data-model.                     
-- Preserve original **value node types**            
-  - `rename` / `set` keep AST (`CallExpression`, etc.), not strings.                         
-- Support `renameSpecifiers` & `dropSpecifiers`     
-  - Enables package-wide icon migration; implement with Icons example.                       
-- Improved diff UX & flow                           
-  - Select spec → dry-run preview per file → confirm → mutate; collapsible diffs.            
-- Remove legacy code & JSONs                        
-  - Delete `reportGlobalUsage`, wizard modules; optional `graph.json` export only.           
-
-*(Extra tasks grouped so milestone stays at \~8 items while covering M1–M8 initiatives.)*
+_(Extra tasks grouped so milestone stays at \~8 items while covering M1–M8 initiatives.)_
 
 ---
 
 ## How to import into Linear
 
-* **Project** → **🚚 jsx-migr8**
-* Copy the **Overview** section into the project description.
-* Create three **Milestones** named as above, with the indicated tasks.
-* Paste each task title & description; mark sub-tasks where indented.
+- **Project** → **🚚 jsx-migr8**
+- Copy the **Overview** section into the project description.
+- Create three **Milestones** named as above, with the indicated tasks.
+- Paste each task title & description; mark sub-tasks where indented.
 
 That’s it – the full history and the path ahead are now captured in Linear. 🎯

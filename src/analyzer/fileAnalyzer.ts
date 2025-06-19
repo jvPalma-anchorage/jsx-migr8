@@ -5,7 +5,7 @@ import { analyzeImportDeclaration } from "./imports";
 import { analyzeJSXElement } from "./jsxUsage";
 
 /** Analyse a single file: imports + JSX usage */
-export function analyzeFile(absPath: string) {
+export const analyzeFile = (absPath: string) => {
   const [ast] = getFileCode(absPath);
 
   visit(ast, {
@@ -18,4 +18,4 @@ export function analyzeFile(absPath: string) {
       this.traverse(path);
     },
   });
-}
+};

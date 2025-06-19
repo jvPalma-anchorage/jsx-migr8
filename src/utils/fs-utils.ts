@@ -1,33 +1,54 @@
-import fs from "node:fs";
+/**
+ * File system utilities barrel export
+ * Re-exports all file system related utilities from categorized modules
+ */
 
-import { types as T, parse } from "recast";
-import babelParser from "recast/parsers/babel-ts";
+// AST and code parsing
+export {
+  getAstFromCode,
+  getFileAstAndCodeAsync,
+  getFileAstAndCode,
+} from "./fs/ast-operations";
 
-export const getMigr8RulesFileNames = () =>
-  fs.readdirSync("migr8Rules").filter((e) => e.endsWith("migr8.json"));
+// JSON operations
+export {
+  getJsonFile,
+  getJsonFileAsync,
+  writeJsonFileAsync,
+} from "./fs/json-operations";
 
-export const getAstFromCode = (code: string) =>
-  parse(code, { parser: babelParser });
+// Migration-specific utilities
+export {
+  getMigr8RulesFileNames,
+  getMigr8RulesFileNamesAsync,
+} from "./fs/migration-utils";
 
-export const getFileAstAndCodeAsync = async (
-  absPath: string
-): Promise<[T.ASTNode, string]> => {
-  const origCode = await fs.promises.readFile(absPath, "utf8");
-  return [getAstFromCode(origCode), origCode];
-};
+// Error handling
+export {
+  FileOperationError,
+  RetryConfig,
+  DEFAULT_RETRY_CONFIG,
+  sleep,
+  isRetryableError,
+} from "./fs/error-handling";
 
-export const getFileAstAndCode = (filePath: string): [T.ASTNode, string] => {
-  const origCode = fs.readFileSync(filePath, "utf8");
+// Concurrency utilities
+export {
+  Semaphore,
+  AsyncBatchProcessor,
+  getConcurrencyLimit,
+} from "./fs/concurrency-utils";
 
-  return [getAstFromCode(origCode), origCode];
-};
+// Async file operations
+export {
+  readFileAsync,
+  writeFileAsync,
+  fileExistsAsync,
+  getFileStatsAsync,
+} from "./fs/async-file-operations";
 
-export const getJsonFile = <T>(filePath: string) => {
-  let json = undefined;
-  try {
-    json = JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
-  } catch (_e) {
-    json = undefined;
-  }
-  return json;
-};
+// AsyncFileUtils class
+export { AsyncFileUtils } from "./fs/async-file-utils";
+
+// Re-export types for backward compatibility
+export type { RetryConfig as RetryConfiguration } from "./fs/error-handling";

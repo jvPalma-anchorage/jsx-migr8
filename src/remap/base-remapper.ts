@@ -27,7 +27,7 @@ export type RemapFile = {
 
 export const basePropsRemap = (
   pks: string[],
-  components: Record<string, RemapRule[]>[]
+  components: Record<string, RemapRule[]>[],
 ): RemapFile => {
   const remapRules: RemapFile = {};
 

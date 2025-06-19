@@ -24,5 +24,17 @@ ${chalk.green("   🔍 Scanning codebase ...")}`,
     name: "🚀  Migrate code for real (YOLO)",
     value: "migrate",
   },
+  backupManagement: {
+    name: "📦  Backup Management",
+    value: "backupManagement",
+    description: chalk.cyanBright(
+      "Create, list, verify, and manage code backups",
+    ),
+  },
+  rollbackMenu: {
+    name: "🔄  Rollback Migration",
+    value: "rollbackMenu",
+    description: chalk.cyanBright("Restore code from previous backups"),
+  },
   exit: { name: "⏹  Exit", value: "exit" },
 };

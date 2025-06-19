@@ -21,7 +21,7 @@ export type Selections = {
 
 /* ────────── MAIN SCANNER FLOW ───────────────────────────────────── */
 export const propsScanner = async (summary: ComponentPropsSummary) => {
-  let message = undefined;
+  const messageState = { value: undefined as string | undefined };
   /* generates all options -------------------------------------------- */
   const pkgOptions = buildPkgOptions(summary);
   const { compPkgOptions, keysPerComp } = buildComponentMaps(summary);
@@ -70,7 +70,7 @@ export const propsScanner = async (summary: ComponentPropsSummary) => {
         const [propsSortedByUsage, description] = printTotalProps(
           keys!,
           opt.pkg!,
-          compOpt
+          compOpt,
         );
         return {
           name: opt.description!,
@@ -99,7 +99,7 @@ export const propsScanner = async (summary: ComponentPropsSummary) => {
 
     if (next === "genRules") {
       // returns to main menu
-      message = await genMigr8Rule(summary, selections);
+      messageState.value = await genMigr8Rule(summary, selections);
       console.log(1111, message);
       break;
     }
@@ -114,6 +114,6 @@ export const propsScanner = async (summary: ComponentPropsSummary) => {
     }
   }
 
-  console.log("return", message);
-  return message;
+  console.log("return", messageState.value);
+  return messageState.value;
 };

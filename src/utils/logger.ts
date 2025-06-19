@@ -1,4 +1,4 @@
-import chalk, { ColorName } from "chalk";
+import { default as chalk, ColorName } from "chalk";
 import { GlobalState } from "../types";
 
 type Logger = {

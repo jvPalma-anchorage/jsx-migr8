@@ -28,17 +28,20 @@ export const getImportDetails = (
           return acc;
         }
 
-        let importedName: ImportSpecifierDetails["importedName"] = undefined;
-        let importType: ImportSpecifierDetails["importType"] = undefined;
+        const importedName: ImportSpecifierDetails["importedName"] =
+          type === "ImportSpecifier"
+            ? (spec.imported as any).name
+            : type === "ImportDefaultSpecifier"
+              ? "default"
+              : undefined;
+        const importType: ImportSpecifierDetails["importType"] =
+          type === "ImportSpecifier"
+            ? "named"
+            : type === "ImportDefaultSpecifier"
+              ? "default"
+              : undefined;
 
-        if (type === "ImportSpecifier") {
-          importedName = (spec.imported as any).name;
-          importType = "named";
-        } else if (type === "ImportDefaultSpecifier") {
-          // Treat default as a named export called "default"
-          importedName = "default"; // <- logical name of the export
-          importType = "default";
-        } else {
+        if (!importType) {
           console.warn(chalk.yellow("\t\t Import type unhandled: "), type);
         }
 
@@ -63,7 +66,7 @@ export const checkIfJsxInImportsReport = (
 ): [string, ImportSpecifierDetails] | undefined => {
   const { PACKAGES, report } = getContext();
 
-  let pkgNameFound = "";
+  const pkgNameFound = { value: "" };
   const pkg = PACKAGES.reduce<ImportSpecifierDetails | undefined>(
     (prev, pkgName) => {
       if (prev) return prev; // if we already found the package, skip
@@ -75,7 +78,7 @@ export const checkIfJsxInImportsReport = (
           return false;
         }
 
-        pkgNameFound = pkgName;
+        pkgNameFound.value = pkgName;
         return true;
 
         // if (localName === jsxLocalName || importedName === jsxImportedName) {
@@ -90,10 +93,13 @@ export const checkIfJsxInImportsReport = (
 
   if (!pkg) return;
 
-  return [pkgNameFound, pkg];
+  return [pkgNameFound.value, pkg];
 };
 
-export function analyzeImportDeclaration(path: ImportPath, filePath: string) {
+export const analyzeImportDeclaration = (
+  path: ImportPath,
+  filePath: string,
+) => {
   const { report } = getContext();
 
   const importDetails = getImportDetails(path, filePath);
@@ -109,4 +115,4 @@ export function analyzeImportDeclaration(path: ImportPath, filePath: string) {
       report[importDetails.packageName]._imports = [specDetails];
     }
   });
-}
+};

@@ -2,13 +2,13 @@ import { getContext } from "@/context";
 import { Migr8Spec } from "@/report/types";
 import { ComponentPropsSummary, ComponentUsage } from "@/types";
 import { MIGRATE_RULES_DIR } from "@/utils/constants";
-import chalk from "chalk";
+import { default as chalk } from "chalk";
 import { Selections } from ".";
 import { buildUsageTable } from "./printSelections";
 
 const migr8RuleComponent = (
   pkgName: string,
-  oldComponent: string
+  oldComponent: string,
 ): Migr8Spec["migr8rules"][number] => ({
   package: pkgName,
   importType: "TODO: named | default",
@@ -23,7 +23,7 @@ const migr8RuleComponent = (
 
 export const genMigr8Rule = async (
   summary: ComponentPropsSummary,
-  selections: Selections
+  selections: Selections,
 ) => {
   const { packages, components, tables } = selections;
 

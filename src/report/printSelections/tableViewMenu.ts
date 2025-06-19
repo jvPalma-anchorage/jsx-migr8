@@ -5,7 +5,7 @@ import { buildUsageTable } from "./propsTable";
 
 export const tableViewMenu = async (
   summary: ComponentPropsSummary,
-  selections: Selections
+  selections: Selections,
 ): Promise<"pkg" | "comp" | "menu" | "genRules"> => {
   const { tables } = selections;
 

@@ -34,7 +34,14 @@
     "yolo": "yarn start --yolo",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
-    "test": "echo \"No tests yet\""
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:backup": "jest src/backup/__tests__",
+    "test:backup:watch": "jest src/backup/__tests__ --watch",
+    "test:backup:coverage": "jest src/backup/__tests__ --coverage",
+    "test:integration": "tsx src/cli/index.ts --help && echo '✅ CLI integration test passed'",
+    "test:imports": "tsx -e \"import('./src/backup/index.ts').then(() => console.log('✅ All backup imports work')).catch(err => { console.error('❌ Import test failed:', err); process.exit(1); })\""
   },
   "dependencies": {
     "@babel/core": "7.27.4",
@@ -48,14 +55,18 @@
     "yargs": "17.7.2"
   },
   "devDependencies": {
+    "@jest/globals": "30.0.0",
+    "@types/jest": "30.0.0",
     "@types/node": "22.15.29",
     "@types/yargs": "17.0.33",
     "chalk": "5.4.1",
     "diff": "8.0.2",
     "eslint": "9.28.0",
     "eslint-config-prettier": "10.1.5",
+    "jest": "30.0.0",
     "module-alias": "2.2.3",
     "prettier": "3.3.3",
+    "ts-jest": "29.4.0",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
     "tsup": "8.5.0",

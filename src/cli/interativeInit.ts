@@ -22,7 +22,7 @@ export const showCompSpecDiff = (
     migrateTo: string;
     newPkg: string;
   },
-  print = true
+  print = true,
 ) => {
   /* ------------------------------------------------------------------ */
   /*  4. Show coloured Git-style diff preview                           */
@@ -66,7 +66,7 @@ export const Demo = () => (
 /* ------------------------------------------------------------------ */
 /*  2. Interactive wizard                                             */
 /* ------------------------------------------------------------------ */
-export async function wizard(ctx: GlobalState) {
+export const wizard = async (ctx: GlobalState) => {
   const { compSpec, QUEUE_COMPONENT_SPEC_DIR, QUEUE_COMPONENT_SPEC } = ctx;
 
   console.info(chalk.cyanBright("\n✨  Interactive component scanner  ✨\n"));
@@ -90,8 +90,8 @@ export async function wizard(ctx: GlobalState) {
   console.info(
     chalk.green(
       "\n↩︎  Type ALL packages that currently export the component.\n" +
-        "    Hit Enter on an empty line to finish:"
-    )
+        "    Hit Enter on an empty line to finish:",
+    ),
   );
   const oldPkgs: string[] = compSpec?.old.oldImportPath || [];
 
@@ -148,13 +148,13 @@ export async function wizard(ctx: GlobalState) {
   fs.writeFileSync(
     QUEUE_COMPONENT_SPEC,
     JSON.stringify(payload, null, 2),
-    "utf8"
+    "utf8",
   );
 
   console.info(
     chalk.magentaBright(
-      "\n📜  Preview of the transformation (context = 3 lines):\n"
-    )
+      "\n📜  Preview of the transformation (context = 3 lines):\n",
+    ),
   );
 
   showCompSpecDiff({
@@ -167,7 +167,7 @@ export async function wizard(ctx: GlobalState) {
 
   console.info(
     chalk.greenBright(
-      `\n\n✅  Saved to ${path.relative(process.cwd(), QUEUE_COMPONENT_SPEC)}\n`
-    )
+      `\n\n✅  Saved to ${path.relative(process.cwd(), QUEUE_COMPONENT_SPEC)}\n`,
+    ),
   );
-}
+};

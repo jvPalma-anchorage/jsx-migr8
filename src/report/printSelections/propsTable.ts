@@ -1,6 +1,6 @@
 import { filterWhiteListedProps } from "@/report/utils";
 import { ComponentUsage } from "@/types";
-import chalk, { BackgroundColorName, ColorName } from "chalk";
+import { default as chalk, BackgroundColorName, ColorName } from "chalk";
 
 export type PropRowItem = {
   count: number;
@@ -11,23 +11,18 @@ const printCustomCliTable = (
   printTable: boolean,
   header: string[],
   totals: Record<string, string | number>,
-  data: Record<string, string | number>[]
+  data: Record<string, string | number>[],
 ) => {
   const print = printTable ? console.info : () => {};
 
   const prepareText = (text: string, isHeader: boolean, i: number) => {
     const dataColumns = i > 1;
     const noData = dataColumns && text === "-";
-    let printText = "";
+    const printText =
+      text.length > 16 ? `${text.slice(0, 13)}...` : text.padEnd(16);
 
     if (!dataColumns) {
       return text.padStart(3);
-    }
-
-    if (text.length > 16) {
-      printText = `${text.slice(0, 13)}...`;
-    } else {
-      printText = text.padEnd(16);
     }
 
     return noData ? chalk.dim(printText) : chalk.bold(printText);
@@ -35,33 +30,24 @@ const printCustomCliTable = (
 
   const pCell = (t: string, ri: number | string, ci: number) => {
     const noData = t === "-";
-    let txColor: ColorName = "white";
-    let isHeader = ri === "header";
-
-    if (ci === 0) {
-      txColor = "yellowBright";
-    } else if (ci === 1) {
-      txColor = "blueBright";
-    } else if (ci > 2 && noData) {
-      txColor = "gray";
-    } else {
-      txColor = "greenBright";
-    }
-
-    if (isHeader) {
-      txColor = "whiteBright";
-    }
+    const isHeader = ri === "header";
+    const txColor: ColorName = isHeader
+      ? "whiteBright"
+      : ci === 0
+        ? "yellowBright"
+        : ci === 1
+          ? "blueBright"
+          : ci > 2 && t === "-"
+            ? "gray"
+            : "greenBright";
 
     return chalk[txColor](prepareText(t, isHeader, ci));
   };
 
   const pRow = (t: string[], i: number | string) => {
     // const bg = i % 2 === 0 ? "bgGray" : "bgBlack";
-    let bg: BackgroundColorName = "bgBlack";
-
-    if (typeof i === "string") {
-      bg = "bgGray";
-    }
+    const bg: BackgroundColorName =
+      typeof i === "string" ? "bgGray" : "bgBlack";
 
     const syml = chalk.bgGray(chalk.whiteBright("|"));
     const prefix = `${syml} `;
@@ -70,12 +56,12 @@ const printCustomCliTable = (
 
     print(
       chalk[bg](
-        `${prefix}${t.map((cell, ci) => pCell(cell, i, ci)).join(joinner)}${sufix}`
-      )
+        `${prefix}${t.map((cell, ci) => pCell(cell, i, ci)).join(joinner)}${sufix}`,
+      ),
     );
   };
   const seperatorRow = header.map((_, i) =>
-    i > 1 ? "----------------" : "---"
+    i > 1 ? "----------------" : "---",
   );
 
   print("\n\n");
@@ -102,18 +88,18 @@ const printCustomCliTable = (
   pRow(seperatorRow, "separator");
   print(
     chalk.bgGray(
-      chalk.whiteBright("   - #1 ▸ ID of the table row".padEnd(130, " "))
-    )
+      chalk.whiteBright("   - #1 ▸ ID of the table row".padEnd(130, " ")),
+    ),
   );
   print(
     chalk.bgGray(
       chalk.whiteBright(
         "   - #2 ▸ number of times that combination of props was found in the code".padEnd(
           130,
-          " "
-        )
-      )
-    )
+          " ",
+        ),
+      ),
+    ),
   );
   print("\n");
 };
@@ -121,7 +107,7 @@ const printCustomCliTable = (
 export const buildUsageTable = (
   usages: ComponentUsage[],
   propsSortedByUsage: string[],
-  printTable = true
+  printTable = true,
 ): {
   rows: PropRowItem[];
   orderedKeys: string[];
@@ -131,7 +117,7 @@ export const buildUsageTable = (
 
   usages.forEach((u) => {
     const sortedEntries = Object.entries(filterWhiteListedProps(u.props)).sort(
-      ([a], [b]) => a.localeCompare(b)
+      ([a], [b]) => a.localeCompare(b),
     );
     const key = JSON.stringify(sortedEntries);
     if (!seen.has(key)) {
@@ -165,7 +151,7 @@ export const buildUsageTable = (
 
   //* 2 ▸ sorts ROWS by number of props (desc) */
   const rows = Array.from(seen.values()).sort(
-    (a, b) => Object.keys(b.props).length - Object.keys(a.props).length
+    (a, b) => Object.keys(b.props).length - Object.keys(a.props).length,
   );
 
   //* 3 ▸ sorts COLUMNS by number times used (desc) */
@@ -185,7 +171,7 @@ export const buildUsageTable = (
   //* first totals row */
   const totals: Record<string, string | number> = {};
   orderedKeys.forEach(
-    (k) => (totals[k] = usages.filter((u) => k in u.props).length + "x")
+    (k) => (totals[k] = usages.filter((u) => k in u.props).length + "x"),
   );
 
   //* converts rows to flat object for console.table */

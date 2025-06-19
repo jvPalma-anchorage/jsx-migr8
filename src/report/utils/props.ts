@@ -9,6 +9,6 @@ export const filterWhiteListedProps = (props: Record<string, string>) => {
   return Object.fromEntries(
     Object.entries(props)
       .sort(([a], [b]) => a.localeCompare(b))
-      .filter(([k]) => !propsToSafelyIgnore.includes(k))
+      .filter(([k]) => !propsToSafelyIgnore.includes(k)),
   );
 };

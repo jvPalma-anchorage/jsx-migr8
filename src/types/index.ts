@@ -58,7 +58,7 @@ export type ImportDetails = {
 };
 
 export type ImportSpecifierDetails = {
-  file: string;
+  filePath: string;
   type: NonNullable<ImportDeclaration["specifiers"]>[number]["type"];
   importType: "named" | "default" | undefined;
   importStm: string;

@@ -5,10 +5,7 @@
       "@anchorage/common/dist/components",
       "@anchorage/common/dist/components/Text"
     ],
-    "components": [
-      "Text",
-      "Text"
-    ]
+    "components": ["Text", "Text"]
   },
   "migr8rules": [
     {
@@ -555,9 +552,7 @@
         },
         {
           "order": 46,
-          "match": [
-            {}
-          ],
+          "match": [{}],
           "set": {},
           "remove": []
         }
@@ -617,9 +612,7 @@
         },
         {
           "order": 51,
-          "match": [
-            {}
-          ],
+          "match": [{}],
           "set": {},
           "remove": []
         }

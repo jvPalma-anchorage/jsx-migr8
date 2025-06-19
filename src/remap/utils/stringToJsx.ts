@@ -1,5 +1,5 @@
 import { parse, types, visit } from "recast";
-import babelParser from "recast/parsers/babel-ts";
+import { default as babelParser } from "recast/parsers/babel-ts";
 import { JSXAttribute, JSXElement } from "../../types";
 const b = types.builders;
 
@@ -16,10 +16,10 @@ interface PlaceholderMaps {
  *   • {...INNER_PROPS}  ─►   maps.INNER_PROPS
  *   • {CHILDREN}        ─►   maps.CHILDREN   (array of JSXChild)
  */
-export function stringToJsx(
+export const stringToJsx = (
   tpl: string,
   maps: PlaceholderMaps = {},
-): JSXElement {
+): JSXElement => {
   /* 1. parse ---------------------------------------------------------------- */
   const wrapped = `<>${tpl.replaceAll("\n\n", "\n")}</>`; // fragment wrapper
   const ast = parse(wrapped, { parser: babelParser }) as JSXElement;
@@ -58,4 +58,4 @@ export function stringToJsx(
   });
 
   return topLevel;
-}
+};

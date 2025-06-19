@@ -1,6 +1,8 @@
 import { types as t } from "recast";
 
-export function getPropValue(node: any): string {
+export function getPropValue(node: any): string | undefined {
+  if (!node) return undefined;
+  
   if (t.namedTypes.StringLiteral.check(node)) {
     return node.value;
   }
