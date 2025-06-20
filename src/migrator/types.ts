@@ -18,6 +18,7 @@ export type MigrationMapper = {
     codeCompare: {
       ast: T.ASTNode | undefined;
       old: string;
+      transformedAst?: T.ASTNode; // Used for preview mode to store transformed AST
     };
     importNode: ComponentUsage["impObj"];
     elements: JsxUsage[];

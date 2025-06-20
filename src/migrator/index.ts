@@ -693,6 +693,9 @@ Please create one in "🔍  Inspect components"`;
         
         try {
           newCode = print(workingAst).code || "2 N/A";
+          // Use transformedAst for preview mode if available, otherwise use the main AST
+//          const astToUse = !changeCode && codeCompare.transformedAst ? codeCompare.transformedAst : codeCompare.ast!;
+//          newCode = print(astToUse).code || "2 N/A";
         } catch (error) {
           lError(`Failed to print AST for ${fileAbsPath}:`, error as any);
           migrationErrors.push(`Print AST failed: ${fileAbsPath}`);

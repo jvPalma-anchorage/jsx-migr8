@@ -7,6 +7,7 @@ import { propRemove } from "./propRemove";
 import { propSet } from "./propSet";
 import { handleReplaceWithJsx } from "./replaceWithJsx";
 import { getRuleMatch } from "./ruleMatch";
+import { createWorkingCopyForPreview } from "@/utils/ast-utils";
 
 export const applyRemapRule = (
   changeCode: boolean,
@@ -20,25 +21,28 @@ export const applyRemapRule = (
     mutated = true;
   };
 
+  // Create a copy of the AST for preview mode to prevent mutation of original
+  const workingMigrationObj = changeCode ? migrationObj : createWorkingCopyForPreview(migrationObj);
+
   const spec = migr8Specs.migr8rules.find(
     (r) =>
-      r.package === migrationObj.packageName &&
-      r.component === migrationObj.component,
+      r.package === workingMigrationObj.packageName &&
+      r.component === workingMigrationObj.component,
   );
 
   if (!spec) {
     lWarning(
       "No migr8 rule found",
-      `for ${migrationObj.packageName} - ${migrationObj.component}`,
+      `for ${workingMigrationObj.packageName} - ${workingMigrationObj.component}`,
     );
     return false;
   }
   const migr8rules = spec.rules;
-  const locName = migrationObj.component;
+  const locName = workingMigrationObj.component;
 
   const toPrune: Set<string> = new Set();
 
-  migrationObj.elements.forEach((elem) => {
+  workingMigrationObj.elements.forEach((elem) => {
     const rule = getRuleMatch(migr8rules, elem.props);
     if (!rule) return;
     const opener = elem.opener.node.openingElement;
@@ -105,7 +109,7 @@ export const applyRemapRule = (
   // ** ---------- IMPORT [  REMOVE COMP IMPORT  FROM OLD PKG  ] ---------------------------- */
   // ** ---------- IMPORT [   ADD   COMP IMPORT   TO  NEW PKG  ] ---------------------------- */
   // ** ---------- IMPORT [ ADD OLD PKG TO PRUNE LIST IF EMPTY ] ---------------------------- */
-  migrationObj.elements.forEach((elem) => {
+  workingMigrationObj.elements.forEach((elem) => {
     const rule = getRuleMatch(migr8rules, elem.props);
     if (!rule) return;
 
@@ -114,21 +118,21 @@ export const applyRemapRule = (
     //   mutated = true;
 
     //   const pruneImport = impRemove(
-    //     migrationObj.codeCompare?.ast!,
-    //     migrationObj
+    //     workingMigrationObj.codeCompare?.ast!,
+    //     workingMigrationObj
     //   );
 
     //   if (!!pruneImport) {
     //     toPrune.add(pruneImport);
     //   }
 
-    //   impSet(migrationObj.codeCompare?.ast!, locName, rule.importTo);
+    //   impSet(workingMigrationObj.codeCompare?.ast!, locName, rule.importTo);
     // }
   });
 
   // ** ---------- IMPORT [  REMOVE OLD PGK IMPORT IF EMPTY ] ---------------------------- */
   if (toPrune.size > 0) {
-    visit(migrationObj.codeCompare?.ast!, {
+    visit(workingMigrationObj.codeCompare?.ast!, {
       visitImportDeclaration(p) {
         const thisImportStm = print(p.node).code;
 
@@ -141,6 +145,12 @@ export const applyRemapRule = (
         this.traverse(p);
       },
     });
+  }
+
+  // If we're in preview mode, update the original migration object with the transformed AST
+  // so that diff generation can access it
+  if (!changeCode && mutated && workingMigrationObj.codeCompare) {
+    migrationObj.codeCompare!.transformedAst = workingMigrationObj.codeCompare.ast;
   }
 
   return mutated;

@@ -14,6 +14,7 @@ import {
   showRollbackMenu,
   performInteractiveRollback,
 } from "./rollback-operations";
+import { performMigration } from "./core-migration";
 
 /**
  * Show enhanced action menu with backup options
@@ -123,8 +124,14 @@ export async function handleAction(
 ): Promise<boolean> {
   switch (action) {
     case "preview":
-      // Existing preview logic would go here
-      console.log(chalk.blue("Preview diffs functionality..."));
+      // Generate and display diffs for preview
+      console.log(chalk.blue("\n🔍 Generating migration preview diffs...\n"));
+      try {
+        await performMigration(migrationMapper, migr8Spec, false);
+        console.log(chalk.green("\n✅ Diff preview completed"));
+      } catch (error) {
+        console.error(chalk.red("\n❌ Failed to generate preview:"), error);
+      }
       return true;
 
     case "confirm":
