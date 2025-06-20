@@ -17,6 +17,7 @@ import { getBackupManager } from "../backup/backup-manager";
 import { RollbackManager } from "../backup/rollback-manager";
 import { SnapshotManager } from "../backup/snapshot-manager";
 import { MetadataManager } from "../backup/metadata-manager";
+import { BackupConfig } from "../backup/types";
 import { getBackupSystemStatus, showBackupHint } from "./backup-integration";
 import { resetSecureContext } from "../validation/secure-config";
 
@@ -283,7 +284,7 @@ const handleRollbackMenu = async (): Promise<void> => {
     });
 
     // Show backup details
-    const metadata = await backupManager.getBackupInfo(selectedBackupId);
+    const metadata = await backupManager.getBackupInfo(selectedBackupId as string);
     if (metadata) {
       console.log(chalk.blue("\n📦 Selected Backup:"));
       console.log(`   Name: ${metadata.name}`);
@@ -321,13 +322,22 @@ const handleRollbackMenu = async (): Promise<void> => {
     );
 
     // Perform rollback
-    const snapshotManager = new SnapshotManager(".migr8-backups", {
-      gitIntegration: false,
+    const backupConfig: BackupConfig = {
+      maxBackups: 10,
+      maxAgeDays: 30,
+      maxTotalSize: 1024 * 1024 * 1024, // 1GB
       autoCleanup: false,
+      cleanupSchedule: "0 0 * * *",
+      compression: false,
+      compressionLevel: 6,
+      gitIntegration: false,
+      namingPattern: "{timestamp}-{component}",
+      excludePatterns: ["node_modules/**", ".git/**"],
       verifyAfterBackup: false,
       showProgress: false,
       concurrency: 1
-    });
+    };
+    const snapshotManager = new SnapshotManager(".migr8-backups", backupConfig);
     const metadataManager = new MetadataManager(".migr8-backups");
     const rollbackManager = new RollbackManager(
       snapshotManager,
@@ -338,7 +348,7 @@ const handleRollbackMenu = async (): Promise<void> => {
     console.log(chalk.blue("🔄 Starting rollback process..."));
 
     const result =
-      await rollbackManager.performInteractiveRollback(selectedBackupId);
+      await rollbackManager.performInteractiveRollback(selectedBackupId as string);
 
     if (result.status === "success") {
       console.log(chalk.green(`✅ Rollback completed successfully`));
@@ -402,13 +412,22 @@ const handleBackupFlags = async (): Promise<boolean> => {
       // Specific backup ID provided
       console.log(chalk.blue(`🔄 Rolling back to backup: ${runArgs.rollback}`));
 
-      const snapshotManager = new SnapshotManager(".migr8-backups", {
-        gitIntegration: false,
+      const backupConfig: BackupConfig = {
+        maxBackups: 10,
+        maxAgeDays: 30,
+        maxTotalSize: 1024 * 1024 * 1024, // 1GB
         autoCleanup: false,
+        cleanupSchedule: "0 0 * * *",
+        compression: false,
+        compressionLevel: 6,
+        gitIntegration: false,
+        namingPattern: "{timestamp}-{component}",
+        excludePatterns: ["node_modules/**", ".git/**"],
         verifyAfterBackup: false,
         showProgress: false,
         concurrency: 1
-      });
+      };
+      const snapshotManager = new SnapshotManager(".migr8-backups", backupConfig);
       const metadataManager = new MetadataManager(".migr8-backups");
       const rollbackManager = new RollbackManager(
         snapshotManager,

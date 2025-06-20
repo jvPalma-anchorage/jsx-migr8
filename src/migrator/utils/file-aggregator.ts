@@ -237,8 +237,11 @@ export class FileAggregator {
           errors.push(`Component ${index}: Missing package name`);
         }
         
-        if (!component.elements || component.elements.length === 0) {
-          errors.push(`Component ${index} (${component.componentName}): No JSX elements found`);
+        // Allow components with no elements - they might still need import transformations
+        if (!component.elements) {
+          // Initialize empty array if elements is undefined
+          component.elements = [];
+          lWarning(`Component ${index} (${component.componentName}): No JSX elements found, but will process for potential import changes`);
         }
       });
 

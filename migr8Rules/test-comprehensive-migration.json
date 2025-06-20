@@ -1,0 +1,263 @@
+{
+  "name": "Test Comprehensive Migration",
+  "description": "Test migration rules covering common JSX patterns and edge cases",
+  "version": "1.0.0",
+  "createdAt": "2025-06-21T00:00:00Z",
+  "lookup": {
+    "packages": ["@anchorage/common", "@common-latitude/ui-map-1"],
+    "components": ["Text", "Button", "Card", "Dialog", "Input", "Select", "Checkbox", "Radio", "Modal", "Tooltip"]
+  },
+  "migr8rules": [
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Text",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Text",
+        "component": "Text"
+      },
+      "rules": [
+        {
+          "filters": { "variant": "h1" },
+          "rename": { "variant": "type" },
+          "set": { "type": "heading1" }
+        },
+        {
+          "filters": { "variant": "h2" },
+          "rename": { "variant": "type" },
+          "set": { "type": "heading2" }
+        },
+        {
+          "filters": { "variant": "body" },
+          "remove": ["variant"],
+          "set": { "type": "body" }
+        },
+        {
+          "filters": { "color": "primary" },
+          "rename": { "color": "textColor" }
+        },
+        {
+          "filters": { "size": "small" },
+          "remove": ["size"],
+          "set": { "fontSize": "sm" }
+        },
+        {
+          "filters": { "size": "large" },
+          "remove": ["size"],
+          "set": { "fontSize": "lg" }
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Button",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Button",
+        "component": "Button"
+      },
+      "rules": [
+        {
+          "filters": { "variant": "primary" },
+          "rename": { "variant": "appearance" },
+          "set": { "appearance": "primary" }
+        },
+        {
+          "filters": { "variant": "secondary" },
+          "rename": { "variant": "appearance" },
+          "set": { "appearance": "secondary" }
+        },
+        {
+          "filters": { "size": "small" },
+          "rename": { "size": "buttonSize" }
+        },
+        {
+          "filters": { "disabled": true },
+          "set": { "isDisabled": true },
+          "remove": ["disabled"]
+        },
+        {
+          "filters": { "loading": true },
+          "set": { "isLoading": true },
+          "remove": ["loading"]
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Card",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Card",
+        "component": "Card"
+      },
+      "rules": [
+        {
+          "filters": { "elevated": true },
+          "set": { "shadow": "md" },
+          "remove": ["elevated"]
+        },
+        {
+          "filters": { "bordered": true },
+          "set": { "borderStyle": "solid" },
+          "remove": ["bordered"]
+        },
+        {
+          "filters": { "padding": "small" },
+          "rename": { "padding": "p" },
+          "set": { "p": "2" }
+        },
+        {
+          "filters": { "padding": "large" },
+          "rename": { "padding": "p" },
+          "set": { "p": "6" }
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Dialog",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Dialog",
+        "component": "Dialog"
+      },
+      "rules": [
+        {
+          "filters": { "open": true },
+          "rename": { "open": "isOpen" }
+        },
+        {
+          "filters": { "onClose": "*" },
+          "rename": { "onClose": "onDismiss" }
+        },
+        {
+          "filters": { "size": "fullscreen" },
+          "set": { "fullScreen": true },
+          "remove": ["size"]
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Input",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Input",
+        "component": "Input"
+      },
+      "rules": [
+        {
+          "filters": { "error": true },
+          "set": { "hasError": true },
+          "remove": ["error"]
+        },
+        {
+          "filters": { "helperText": "*" },
+          "rename": { "helperText": "description" }
+        },
+        {
+          "filters": { "fullWidth": true },
+          "set": { "width": "100%" },
+          "remove": ["fullWidth"]
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Select",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Select",
+        "component": "Select"
+      },
+      "rules": [
+        {
+          "filters": { "multiple": true },
+          "set": { "isMulti": true },
+          "remove": ["multiple"]
+        },
+        {
+          "filters": { "clearable": true },
+          "set": { "isClearable": true },
+          "remove": ["clearable"]
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Checkbox",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Checkbox",
+        "component": "Checkbox"
+      },
+      "rules": [
+        {
+          "filters": { "checked": true },
+          "rename": { "checked": "isChecked" }
+        },
+        {
+          "filters": { "indeterminate": true },
+          "set": { "isIndeterminate": true },
+          "remove": ["indeterminate"]
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Radio",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Radio",
+        "component": "Radio"
+      },
+      "rules": [
+        {
+          "filters": { "selected": true },
+          "rename": { "selected": "isSelected" }
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Modal",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Modal",
+        "component": "Modal"
+      },
+      "rules": [
+        {
+          "filters": { "visible": true },
+          "rename": { "visible": "isVisible" }
+        },
+        {
+          "filters": { "backdrop": "static" },
+          "set": { "closeOnOverlayClick": false },
+          "remove": ["backdrop"]
+        }
+      ]
+    },
+    {
+      "package": "@common-latitude/ui-map-1",
+      "component": "Tooltip",
+      "importType": "named",
+      "importTo": {
+        "importStm": "@anchorage/common/dist/components/Tooltip",
+        "component": "Tooltip"
+      },
+      "rules": [
+        {
+          "filters": { "placement": "top" },
+          "rename": { "placement": "position" }
+        },
+        {
+          "filters": { "trigger": "hover" },
+          "set": { "showOnHover": true },
+          "remove": ["trigger"]
+        }
+      ]
+    }
+  ]
+}

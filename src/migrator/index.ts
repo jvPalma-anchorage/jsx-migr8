@@ -159,19 +159,42 @@ export const migrateComponentsFileByFile = async (changeCode = false) => {
       choices: fileOptions,
     });
 
-    // Validate the selected migration rules structure
-    if (!migr8Spec || !migr8Spec.lookup || !migr8Spec.migr8rules) {
-      lError("Migration rules validation failed: Invalid migration rules structure");
-      console.error(chalk.red(`❌ Invalid migration rules structure. Missing lookup or migr8rules section.`));
-      console.error(chalk.yellow('💡 Suggestions:'));
-      console.error(chalk.gray('   • Regenerate the rules file using the component inspector'));
-      console.error(chalk.gray('   • Check that the file follows the migr8 rules format'));
-      console.error(chalk.gray('   • Review the documentation for proper rules structure'));
-      return `⚠ Migration rules validation failed. Please fix the rules file.`;
+    // Validate the selected migration rules structure with more lenient checks
+    if (!migr8Spec) {
+      lError("Migration rules validation failed: No migration spec provided");
+      console.error(chalk.red(`❌ No migration rules selected.`));
+      return `⚠ No migration rules selected.`;
     }
 
-    if (!migr8Spec.migr8rules.length) {
-      console.warn(chalk.yellow('💡 Migration rules are empty - no migrations will be performed'));
+    // Allow partial rules - some sections might be optional
+    if (!migr8Spec.lookup) {
+      lWarning("Migration rules have no lookup section - using defaults");
+      migr8Spec.lookup = {
+        rootPath: process.cwd(),
+        packages: [],
+        components: []
+      };
+    }
+
+    if (!migr8Spec.migr8rules) {
+      lWarning("Migration rules have no migr8rules section - initializing empty");
+      migr8Spec.migr8rules = [];
+    }
+
+    if (migr8Spec.migr8rules.length === 0) {
+      console.warn(chalk.yellow('⚠️  Migration rules are empty - will analyze components but no transformations will be applied'));
+      console.warn(chalk.gray('   This is useful for testing file detection and analysis'));
+    } else {
+      const validRules = migr8Spec.migr8rules.filter(rule => {
+        // Basic validation - must have package and component
+        return rule.package && rule.component;
+      });
+      
+      if (validRules.length < migr8Spec.migr8rules.length) {
+        console.warn(chalk.yellow(`⚠️  ${migr8Spec.migr8rules.length - validRules.length} rules skipped due to missing package or component names`));
+      }
+      
+      console.log(chalk.green(`✅ Loaded ${validRules.length} valid migration rules`));
     }
 
     // Use file aggregator to group changes by file
@@ -199,10 +222,21 @@ export const migrateComponentsFileByFile = async (changeCode = false) => {
     const { valid: validFileInputs, invalid: invalidFileInputs } = FileAggregator.validateFileInputs(fileInputs);
     
     if (invalidFileInputs.length > 0) {
-      lWarning(`${invalidFileInputs.length} files have validation errors and will be skipped`);
+      console.warn(chalk.yellow(`\n⚠️  ${invalidFileInputs.length} files have validation issues:`));
       invalidFileInputs.forEach(({ fileInput, errors }) => {
-        console.warn(chalk.yellow(`⚠️ ${fileInput.filePath}: ${errors.join(', ')}`));
+        console.warn(chalk.gray(`   • ${fileInput.filePath}:`));
+        errors.forEach(error => {
+          // Provide more helpful context for each error type
+          if (error.includes('No components to migrate')) {
+            console.warn(chalk.gray(`     - No matching components found (looking for: ${migr8Spec.lookup.components.join(', ')})`));
+          } else if (error.includes('No JSX elements found')) {
+            console.warn(chalk.gray(`     - Component imported but not used in JSX (import-only transformation may still apply)`));
+          } else {
+            console.warn(chalk.gray(`     - ${error}`));
+          }
+        });
       });
+      console.warn(chalk.gray(`\n   💡 Tip: These files will be skipped. To include them, ensure they contain the target components.`));
     }
 
     if (validFileInputs.length === 0) {
@@ -240,6 +274,25 @@ export const migrateComponentsFileByFile = async (changeCode = false) => {
 
       // Show overall report
       console.log(processor.generateReport(migrationResult));
+      
+      // Show rule application summary
+      const appliedRulesMap = new Map<string, number>();
+      migrationResult.fileTransformations.forEach(ft => {
+        ft.appliedRules.forEach(rule => {
+          const key = `${rule.ruleType}: ${rule.description}`;
+          appliedRulesMap.set(key, (appliedRulesMap.get(key) || 0) + 1);
+        });
+      });
+      
+      if (appliedRulesMap.size > 0) {
+        console.log(chalk.bold("\n🎯 Applied Rules Summary:"));
+        Array.from(appliedRulesMap.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .forEach(([rule, count]) => {
+            console.log(chalk.gray(`   • ${rule} (${count}x)`));
+          });
+      }
 
       // Ask user what to do next
       const action = await secureSelect({

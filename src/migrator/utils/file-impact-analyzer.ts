@@ -65,6 +65,11 @@ export class FileImpactAnalyzer {
             stats.propsAdded++;
             stats.propsRemoved++;
             break;
+          case 'replaceComponent':
+            // Component replacement counts as a modification
+            stats.totalPropsModified--; // Don't double count
+            stats.componentsChanged = Math.max(stats.componentsChanged, 1);
+            break;
         }
       });
     });

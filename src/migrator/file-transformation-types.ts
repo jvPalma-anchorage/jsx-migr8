@@ -8,7 +8,7 @@ import { Migr8Spec } from "@/report";
  * Represents a change made to a component's props
  */
 export interface PropChange {
-  type: 'add' | 'remove' | 'rename' | 'modify';
+  type: 'add' | 'remove' | 'rename' | 'modify' | 'replaceComponent';
   propName: string;
   oldValue?: any;
   newValue?: any;

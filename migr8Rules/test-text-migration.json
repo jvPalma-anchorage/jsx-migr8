@@ -1,0 +1,105 @@
+{
+  "lookup": {
+    "rootPath": "/data/data/com.termux/files/home/coder/apps/backoffice",
+    "packages": [
+      "@anchorage/common/dist/components"
+    ],
+    "components": [
+      "Text"
+    ]
+  },
+  "migr8rules": [
+    {
+      "package": "@anchorage/common/dist/components",
+      "importType": "named",
+      "component": "Text",
+      "importTo": {
+        "importStm": "import { Typography } from '@mui/material'",
+        "importType": "named",
+        "component": "Typography"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [
+            {
+              "type": "heading"
+            }
+          ],
+          "set": {
+            "variant": "h6"
+          },
+          "remove": ["type"]
+        },
+        {
+          "order": 2,
+          "match": [
+            {
+              "type": "body"
+            }
+          ],
+          "set": {
+            "variant": "body1"
+          },
+          "remove": ["type"]
+        },
+        {
+          "order": 3,
+          "match": [
+            {
+              "type": "link"
+            }
+          ],
+          "set": {
+            "component": "a",
+            "color": "primary"
+          },
+          "remove": ["type"]
+        },
+        {
+          "order": 4,
+          "match": [
+            {
+              "size": "small"
+            }
+          ],
+          "rename": {
+            "size": "fontSize"
+          }
+        },
+        {
+          "order": 5,
+          "match": [
+            {
+              "size": "medium"
+            }
+          ],
+          "set": {
+            "fontSize": "medium"
+          },
+          "remove": ["size"]
+        },
+        {
+          "order": 6,
+          "match": [
+            {
+              "size": "large"
+            }
+          ],
+          "set": {
+            "fontSize": "large"
+          },
+          "remove": ["size"]
+        },
+        {
+          "order": 7,
+          "match": [
+            {}
+          ],
+          "set": {},
+          "remove": []
+        }
+      ]
+    }
+  ]
+}
