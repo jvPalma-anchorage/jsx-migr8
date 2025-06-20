@@ -1,0 +1,53 @@
+{
+  "lookup": {
+    "@latitude/ui": {
+      "Text": "@latitude/ui"
+    }
+  },
+  "components": [
+    {
+      "package": "@latitude/ui",
+      "importType": "named",
+      "component": "Text",
+      "importTo": {
+        "component": "Text",
+        "importStm": "@latitude/text",
+        "importType": "named"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [
+            {
+              "type": "heading",
+              "size": "large"
+            }
+          ],
+          "remove": ["type", "size"],
+          "set": {
+            "variant": "headingLarge"
+          }
+        },
+        {
+          "order": 2,
+          "match": [
+            {
+              "type": "body",
+              "size": "medium"
+            }
+          ],
+          "remove": ["type", "size"],
+          "set": {
+            "variant": "bodyMedium"
+          }
+        },
+        {
+          "order": 999,
+          "match": [{}],
+          "set": {},
+          "remove": []
+        }
+      ]
+    }
+  ]
+}

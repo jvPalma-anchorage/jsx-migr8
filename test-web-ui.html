@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jsx-migr8 Web UI Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .component-list {
+            list-style: none;
+            padding: 0;
+        }
+        .component-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>jsx-migr8 Web UI Test</h1>
+        
+        <div id="api-status" class="status info">Checking API connection...</div>
+        <div id="ws-status" class="status info">WebSocket: Not connected</div>
+        
+        <div class="form-group">
+            <label for="project-path">Project Path:</label>
+            <input type="text" id="project-path" value="/data/data/com.termux/files/home/coder/apps/backoffice" />
+        </div>
+        
+        <div class="form-group">
+            <label for="project-name">Project Name:</label>
+            <input type="text" id="project-name" value="Backoffice Test" />
+        </div>
+        
+        <div>
+            <button id="btn-create" onclick="createProject()">1. Create Project</button>
+            <button id="btn-analyze" onclick="analyzeProject()" disabled>2. Analyze Project</button>
+            <button id="btn-list" onclick="listProjects()">3. List Projects</button>
+            <button id="btn-clear" onclick="clearLog()">Clear Log</button>
+        </div>
+        
+        <div class="log" id="log"></div>
+        
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        const WS_URL = 'ws://localhost:3000/ws';
+        let ws = null;
+        let currentProjectId = null;
+        
+        // Logging
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const color = {
+                info: '#0c5460',
+                success: '#155724',
+                error: '#721c24',
+                warning: '#856404'
+            }[type] || '#333';
+            
+            logEl.innerHTML += `<div style="color: ${color}">[${time}] ${message}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // API Status Check
+        async function checkAPI() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'ok') {
+                    document.getElementById('api-status').className = 'status success';
+                    document.getElementById('api-status').textContent = '✓ API Connected';
+                    log('API is healthy', 'success');
+                    return true;
+                } else {
+                    throw new Error('API unhealthy');
+                }
+            } catch (error) {
+                document.getElementById('api-status').className = 'status error';
+                document.getElementById('api-status').textContent = '✗ API Disconnected';
+                log('API connection failed: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        // WebSocket Connection
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) return;
+            
+            log('Connecting to WebSocket...', 'info');
+            ws = new WebSocket(WS_URL);
+            
+            ws.onopen = () => {
+                document.getElementById('ws-status').className = 'status success';
+                document.getElementById('ws-status').textContent = '✓ WebSocket Connected';
+                log('WebSocket connected', 'success');
+            };
+            
+            ws.onclose = () => {
+                document.getElementById('ws-status').className = 'status error';
+                document.getElementById('ws-status').textContent = '✗ WebSocket Disconnected';
+                log('WebSocket disconnected', 'warning');
+                // Reconnect after 3 seconds
+                setTimeout(connectWebSocket, 3000);
+            };
+            
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    handleWebSocketMessage(message);
+                } catch (error) {
+                    log('Failed to parse WebSocket message', 'error');
+                }
+            };
+            
+            ws.onerror = (error) => {
+                log('WebSocket error', 'error');
+            };
+        }
+        
+        function handleWebSocketMessage(message) {
+            if (message.type === 'welcome') {
+                log(`WebSocket client ID: ${message.data.clientId}`, 'info');
+            } else if (message.type === 'progress') {
+                log(`Progress: ${message.data.phase} - ${message.data.progress}%`, 'info');
+            } else if (message.type === 'log') {
+                log(`Log: ${message.data}`, 'info');
+            } else if (message.type === 'error') {
+                log(`Error: ${message.data.message}`, 'error');
+            } else if (message.type === 'complete') {
+                log('Operation completed', 'success');
+            }
+        }
+        
+        // API Operations
+        async function createProject() {
+            const path = document.getElementById('project-path').value;
+            const name = document.getElementById('project-name').value;
+            
+            if (!path || !name) {
+                log('Please provide both path and name', 'error');
+                return;
+            }
+            
+            log(`Creating project: ${name} at ${path}`, 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path, name })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to create project');
+                }
+                
+                currentProjectId = data.data.id;
+                log(`Project created successfully! ID: ${currentProjectId}`, 'success');
+                
+                // Enable analyze button
+                document.getElementById('btn-analyze').disabled = false;
+                
+                // Subscribe to project updates
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'subscribe', projectId: currentProjectId }));
+                }
+                
+                // Show project details
+                showProjectDetails(data.data);
+                
+            } catch (error) {
+                log(`Failed to create project: ${error.message}`, 'error');
+            }
+        }
+        
+        async function analyzeProject() {
+            if (!currentProjectId) {
+                log('No project selected', 'error');
+                return;
+            }
+            
+            log(`Analyzing project ${currentProjectId}...`, 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/projects/${currentProjectId}/analyze`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to analyze project');
+                }
+                
+                log(`Analysis complete! Found ${data.data.componentsFound} components in ${data.data.filesAnalyzed} files`, 'success');
+                
+                // Show analysis results
+                showAnalysisResults(data.data);
+                
+            } catch (error) {
+                log(`Failed to analyze project: ${error.message}`, 'error');
+            }
+        }
+        
+        async function listProjects() {
+            log('Listing all projects...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/projects`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to list projects');
+                }
+                
+                log(`Found ${data.data.length} project(s)`, 'success');
+                
+                // Show project list
+                showProjectList(data.data);
+                
+            } catch (error) {
+                log(`Failed to list projects: ${error.message}`, 'error');
+            }
+        }
+        
+        // UI Updates
+        function showProjectDetails(project) {
+            const html = `
+                <h3>Project Details</h3>
+                <div class="info status">
+                    <strong>ID:</strong> ${project.id}<br>
+                    <strong>Name:</strong> ${project.name}<br>
+                    <strong>Path:</strong> ${project.path}<br>
+                    <strong>Status:</strong> ${project.status}
+                </div>
+            `;
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        function showAnalysisResults(analysis) {
+            let html = `
+                <h3>Analysis Results</h3>
+                <div class="info status">
+                    <strong>Files Analyzed:</strong> ${analysis.filesAnalyzed}<br>
+                    <strong>Components Found:</strong> ${analysis.componentsFound}
+                </div>
+            `;
+            
+            if (analysis.packages && analysis.packages.length > 0) {
+                html += '<h4>Packages:</h4><ul class="component-list">';
+                analysis.packages.forEach(pkg => {
+                    html += `<li class="component-item">
+                        <strong>${pkg.name}</strong>: ${pkg.components.length} components
+                        ${pkg.components.length > 0 ? '<br>Components: ' + pkg.components.slice(0, 5).join(', ') : ''}
+                        ${pkg.components.length > 5 ? '...' : ''}
+                    </li>`;
+                });
+                html += '</ul>';
+            }
+            
+            if (analysis.components && analysis.components.length > 0) {
+                html += '<h4>Sample Components:</h4><ul class="component-list">';
+                analysis.components.slice(0, 10).forEach(comp => {
+                    html += `<li class="component-item">
+                        <strong>${comp.name}</strong> (${comp.package})<br>
+                        Path: ${comp.filePath}<br>
+                        Props: ${comp.props.length}, Usage: ${comp.usageCount}
+                    </li>`;
+                });
+                if (analysis.components.length > 10) {
+                    html += `<li class="component-item">... and ${analysis.components.length - 10} more</li>`;
+                }
+                html += '</ul>';
+            }
+            
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        function showProjectList(projects) {
+            let html = '<h3>All Projects</h3>';
+            
+            if (projects.length === 0) {
+                html += '<div class="warning status">No projects found</div>';
+            } else {
+                html += '<ul class="component-list">';
+                projects.forEach((project, index) => {
+                    html += `<li class="component-item">
+                        <strong>${index + 1}. ${project.name}</strong><br>
+                        ID: ${project.id}<br>
+                        Path: ${project.path}<br>
+                        Status: ${project.status}
+                    </li>`;
+                });
+                html += '</ul>';
+            }
+            
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        // Initialize
+        window.onload = async () => {
+            log('jsx-migr8 Web UI Test Started', 'info');
+            
+            // Check API
+            const apiOk = await checkAPI();
+            
+            if (apiOk) {
+                // Connect WebSocket
+                connectWebSocket();
+            } else {
+                log('Please ensure the API server is running on port 3000', 'error');
+            }
+            
+            // Check API status every 5 seconds
+            setInterval(checkAPI, 5000);
+        };
+    </script>
+</body>
+</html>

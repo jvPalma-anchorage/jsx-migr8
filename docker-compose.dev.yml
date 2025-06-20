@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile.dev
+    container_name: jsx-migr8-api-dev
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - CORS_ORIGIN=http://localhost:5173
+    volumes:
+      - ./packages/api/src:/app/packages/api/src
+      - ./packages/api/package.json:/app/packages/api/package.json
+      - /app/node_modules
+      - /app/packages/api/node_modules
+    ports:
+      - "3001:3001"
+    command: yarn workspace @jsx-migr8/api dev
+    networks:
+      - jsx-migr8-network
+
+  web:
+    build:
+      context: .
+      dockerfile: packages/web/Dockerfile.dev
+    container_name: jsx-migr8-web-dev
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3001
+    volumes:
+      - ./packages/web/src:/app/packages/web/src
+      - ./packages/web/public:/app/packages/web/public
+      - ./packages/web/index.html:/app/packages/web/index.html
+      - ./packages/web/package.json:/app/packages/web/package.json
+      - ./packages/web/vite.config.ts:/app/packages/web/vite.config.ts
+      - /app/node_modules
+      - /app/packages/web/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    command: yarn workspace @jsx-migr8/web dev --host
+    networks:
+      - jsx-migr8-network
+
+networks:
+  jsx-migr8-network:
+    driver: bridge

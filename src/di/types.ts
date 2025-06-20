@@ -76,6 +76,7 @@ export interface IFileService extends IService {
   ensureDir(dirPath: string): Promise<void>;
   glob(pattern: string, options?: { cwd?: string; absolute?: boolean; ignore?: string[] }): Promise<string[]>;
   getFileStats(filePath: string): Promise<{ size: number; mtime: Date }>;
+  findMigr8RuleFiles?(): Promise<string[]>;
 }
 
 // AST processing service interface
@@ -102,7 +103,11 @@ export interface IAnalyzerService extends IService {
 
 // Migration service interface
 export interface IMigratorService extends IService {
-  migrateComponents(options: { dryRun?: boolean; changeCode?: boolean }): Promise<string | void>;
+  migrateComponents(options: { 
+    dryRun?: boolean; 
+    changeCode?: boolean;
+    progressCallback?: (file: string, success: boolean, error?: string) => void;
+  }): Promise<{ filesModified: number; filesSkipped: number; errors: string[] }>;
   applyRules(filePath: string, rules: any): Promise<{ success: boolean; changes?: any }>;
   generateDiff(oldCode: string, newCode: string, filePath: string): string;
 }
