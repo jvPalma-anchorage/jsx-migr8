@@ -1,0 +1,133 @@
+{
+  "name": "Styled Components to Emotion",
+  "description": "Migrates styled-components to @emotion/react and @emotion/styled",
+  "lookup": {
+    "styled-components": ["styled", "css", "keyframes", "ThemeProvider", "createGlobalStyle", "DefaultTheme"]
+  },
+  "components": [
+    {
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled",
+      "transformations": [
+        {
+          "pattern": "import styled",
+          "replacement": "import styled"
+        }
+      ]
+    },
+    {
+      "importFrom": "styled-components",
+      "importTo": "@emotion/react",
+      "transformations": [
+        {
+          "pattern": "css",
+          "replacement": "css"
+        },
+        {
+          "pattern": "keyframes",
+          "replacement": "keyframes"
+        },
+        {
+          "pattern": "ThemeProvider",
+          "replacement": "ThemeProvider"
+        }
+      ]
+    }
+  ],
+  "globalStylesTransformation": {
+    "pattern": "createGlobalStyle`{styles}`",
+    "replacement": {
+      "importAdd": "Global",
+      "importFrom": "@emotion/react",
+      "code": "const globalStyles = css`{styles}`",
+      "usage": "<Global styles={globalStyles} />"
+    }
+  },
+  "themeTransformation": {
+    "pattern": "DefaultTheme",
+    "replacement": {
+      "importAdd": "Theme as EmotionTheme",
+      "importFrom": "@emotion/react",
+      "typeUsage": "EmotionTheme"
+    }
+  },
+  "templateLiteralTransformations": [
+    {
+      "pattern": "${({ theme }) => theme.{property}}",
+      "replacement": "${({ theme }) => theme.{property}}",
+      "description": "Theme access remains the same"
+    },
+    {
+      "pattern": "${({ {prop} }) => {prop} && css`{styles}`}",
+      "replacement": "${({ {prop} }) => {prop} && css`{styles}`}",
+      "description": "Conditional styling remains the same"
+    },
+    {
+      "pattern": "@media (max-width: ${({ theme }) => theme.breakpoints.{breakpoint}}) {",
+      "replacement": "@media (max-width: ${({ theme }) => theme.breakpoints.{breakpoint}}) {",
+      "description": "Media queries remain the same"
+    }
+  ],
+  "styledComponentTransformations": [
+    {
+      "pattern": "const {ComponentName} = styled.{element}`{styles}`;",
+      "replacement": "const {ComponentName} = styled.{element}`{styles}`;",
+      "description": "Basic styled components remain the same"
+    },
+    {
+      "pattern": "const {ComponentName} = styled.{element}<{Props}>`{styles}`;",
+      "replacement": "const {ComponentName} = styled.{element}<{Props}>`{styles}`;",
+      "description": "Typed styled components remain the same"
+    },
+    {
+      "pattern": "const {ComponentName} = styled({OtherComponent})`{styles}`;",
+      "replacement": "const {ComponentName} = styled({OtherComponent})`{styles}`;",
+      "description": "Styled component composition remains the same"
+    }
+  ],
+  "usageTransformations": [
+    {
+      "pattern": "<GlobalStyle />",
+      "replacement": "<Global styles={globalStyles} />",
+      "description": "Replace GlobalStyle component with Global and styles prop"
+    },
+    {
+      "pattern": "createGlobalStyle",
+      "replacement": "css",
+      "description": "Replace createGlobalStyle with css function"
+    }
+  ],
+  "importTransformations": [
+    {
+      "from": "styled-components",
+      "to": [
+        {
+          "module": "@emotion/styled",
+          "imports": ["styled"]
+        },
+        {
+          "module": "@emotion/react", 
+          "imports": ["css", "keyframes", "ThemeProvider", "Global", "Theme as EmotionTheme", "useTheme"]
+        }
+      ]
+    }
+  ],
+  "additionalTransformations": [
+    {
+      "pattern": "DefaultTheme",
+      "replacement": "EmotionTheme",
+      "description": "Replace DefaultTheme type with EmotionTheme"
+    },
+    {
+      "pattern": "createGlobalStyle`",
+      "replacement": "css`",
+      "description": "Replace createGlobalStyle template literal with css"
+    }
+  ],
+  "compatibilityNotes": [
+    "Most styled-components syntax is compatible with Emotion",
+    "Global styles need to be converted from createGlobalStyle to css + Global component",
+    "Theme types need to be updated from DefaultTheme to EmotionTheme",
+    "All other functionality (css prop, keyframes, ThemeProvider) works similarly"
+  ]
+}

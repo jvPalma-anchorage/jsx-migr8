@@ -1,21 +1,97 @@
 import { config } from "dotenv";
 import { default as yargs } from "yargs";
 import { hideBin } from "yargs/helpers";
+import { 
+  validateRootPath, 
+  validateBlacklist, 
+  expandHomePath,
+  isPathSafeForScanning,
+  formatPathError,
+  PathValidationError
+} from "../utils/path-validation";
+import chalk from "chalk";
 
 config();
 
-export const argv = yargs(hideBin(process.argv))
+/**
+ * Validate root path argument
+ */
+function validateRootPathArg(value: string): string | boolean {
+  if (!value) return "Root path is required";
+  
+  try {
+    const expandedPath = expandHomePath(value);
+    
+    // Check basic safety
+    if (!isPathSafeForScanning(expandedPath)) {
+      return "Path is not safe for scanning (system directory detected)";
+    }
+    
+    // Full validation
+    const validation = validateRootPath(expandedPath);
+    if (!validation.valid) {
+      return validation.error!.message;
+    }
+    
+    return true;
+  } catch (error) {
+    return `Path validation failed: ${error instanceof Error ? error.message : "Unknown error"}`;
+  }
+}
+
+/**
+ * Validate blacklist argument
+ */
+function validateBlacklistArg(value: string): string | boolean {
+  if (!value) return true; // Empty blacklist is allowed
+  
+  try {
+    const entries = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    const validation = validateBlacklist(entries);
+    
+    if (!validation.valid) {
+      const firstError = validation.invalidEntries[0];
+      return `Invalid blacklist entry "${firstError.entry}": ${firstError.reason}`;
+    }
+    
+    return true;
+  } catch (error) {
+    return `Blacklist validation failed: ${error instanceof Error ? error.message : "Unknown error"}`;
+  }
+}
+
+export const getArgv = () => yargs(hideBin(process.argv))
   .option("root", {
     alias: "r",
     type: "string",
     default: process.env.ROOT_PATH,
     describe: "Root folder to scan",
+    coerce: (value: string) => {
+      if (value) {
+        const validation = validateRootPathArg(value);
+        if (validation !== true) {
+          console.error(chalk.red(`❌ Invalid root path: ${validation}`));
+          process.exit(1);
+        }
+      }
+      return value;
+    }
   })
   .option("blacklist", {
     alias: "b",
     type: "string",
     default: process.env.BLACKLIST,
     describe: "Comma-separated folders to ignore",
+    coerce: (value: string) => {
+      if (value) {
+        const validation = validateBlacklistArg(value);
+        if (validation !== true) {
+          console.error(chalk.red(`❌ Invalid blacklist: ${validation}`));
+          process.exit(1);
+        }
+      }
+      return value;
+    }
   })
   .option("interative", {
     alias: "i",
@@ -75,6 +151,12 @@ export const argv = yargs(hideBin(process.argv))
     type: "string",
     describe: "Verify integrity of specified backup",
   })
+  .option("optimized", {
+    alias: "opt",
+    type: "boolean",
+    default: false,
+    describe: "Use optimized graph builder for large codebases",
+  })
   .option("cleanupBackups", {
     type: "boolean",
     default: false,
@@ -98,5 +180,36 @@ export const argv = yargs(hideBin(process.argv))
     default: false,
     describe: "Force rollback even with conflicts",
   })
+  .option("maxMemory", {
+    type: "number",
+    default: 1024,
+    describe: "Maximum memory usage in MB before triggering memory management",
+  })
+  .option("concurrency", {
+    type: "number",
+    describe: "Number of concurrent file operations (auto-detected if not specified)",
+  })
+  .option("batchSize", {
+    type: "number",
+    describe: "Batch size for memory-efficient processing (auto-calculated if not specified)",
+  })
+  .option("enableMemoryMonitoring", {
+    type: "boolean",
+    default: true,
+    describe: "Enable memory monitoring and circuit breaker",
+  })
+  .option("quiet", {
+    alias: "q",
+    type: "boolean",
+    default: false,
+    describe: "Reduce output verbosity",
+  })
+  .option("graphTimeout", {
+    type: "number",
+    default: 300000, // 5 minutes
+    describe: "Timeout for graph building in milliseconds",
+  })
   .strict()
   .parseSync();
+
+export const argv = getArgv();

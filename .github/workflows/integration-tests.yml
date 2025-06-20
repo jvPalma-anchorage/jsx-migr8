@@ -1,0 +1,287 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main, develop ]
+  schedule:
+    # Run integration tests nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  test-matrix:
+    name: Test Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['18.x', '20.x', '22.x']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run linting
+      run: yarn lint
+
+    - name: Run unit tests
+      run: yarn test --coverage --passWithNoTests
+
+    - name: Run integration tests
+      run: yarn test:integration
+      env:
+        NODE_ENV: test
+        CI: true
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: matrix.node-version == '22.x' && matrix.os == 'ubuntu-latest'
+      with:
+        file: ./coverage/lcov.info
+        flags: integration
+        name: codecov-umbrella
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: test-matrix
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run performance tests
+      run: yarn test --testNamePattern="Performance" --maxWorkers=1
+      env:
+        NODE_ENV: test
+        CI: true
+        FAIL_ON_REGRESSION: true
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-baseline
+        path: src/__tests__/integration/performance-baseline.json
+        retention-days: 30
+
+  backup-integration:
+    name: Backup System Integration
+    runs-on: ubuntu-latest
+    needs: test-matrix
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Setup Git for backup tests
+      run: |
+        git config --global user.name "Test User"
+        git config --global user.email "test@example.com"
+
+    - name: Run backup integration tests
+      run: yarn test:backup --coverage
+      env:
+        NODE_ENV: test
+        CI: true
+
+    - name: Test CLI integration
+      run: |
+        yarn test:integration
+        yarn test:imports
+      env:
+        NODE_ENV: test
+        CI: true
+
+  snapshot-validation:
+    name: Snapshot Validation
+    runs-on: ubuntu-latest
+    needs: test-matrix
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run snapshot tests
+      run: yarn test --testNamePattern="snapshot|Snapshot" --updateSnapshot=false
+      env:
+        NODE_ENV: test
+        CI: true
+
+    - name: Check for snapshot differences
+      run: |
+        if git diff --exit-code src/__tests__/integration/__snapshots__/; then
+          echo "✅ All snapshots are up to date"
+        else
+          echo "❌ Snapshot differences detected"
+          git diff src/__tests__/integration/__snapshots__/
+          exit 1
+        fi
+
+  cross-platform-compatibility:
+    name: Cross-Platform Compatibility
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Test CLI commands (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        yarn start --help
+        echo "✅ CLI help command works"
+        
+    - name: Test CLI commands (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        yarn start --help
+        echo "✅ CLI help command works"
+      shell: cmd
+
+    - name: Run cross-platform integration tests
+      run: yarn test --testNamePattern="cross.platform|platform" --passWithNoTests
+      env:
+        NODE_ENV: test
+        CI: true
+
+  edge-case-validation:
+    name: Edge Case Validation
+    runs-on: ubuntu-latest
+    needs: test-matrix
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run error scenario tests
+      run: yarn test --testNamePattern="error|Error|edge|Edge" --verbose
+      env:
+        NODE_ENV: test
+        CI: true
+
+    - name: Test malformed input handling
+      run: yarn test --testNamePattern="malformed|Malformed" --verbose
+      env:
+        NODE_ENV: test
+        CI: true
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run security audit
+      run: yarn audit --level moderate
+
+    - name: Check for vulnerable dependencies
+      run: |
+        yarn audit --json > audit-results.json
+        if [ $(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0') -gt 0 ]; then
+          echo "❌ High severity vulnerabilities found"
+          cat audit-results.json | jq '.advisories'
+          exit 1
+        fi
+        echo "✅ No high severity vulnerabilities found"
+
+  integration-summary:
+    name: Integration Test Summary
+    runs-on: ubuntu-latest
+    needs: [test-matrix, performance-tests, backup-integration, snapshot-validation, cross-platform-compatibility, edge-case-validation, security-scan]
+    if: always()
+    
+    steps:
+    - name: Check all job statuses
+      run: |
+        echo "Test Matrix: ${{ needs.test-matrix.result }}"
+        echo "Performance Tests: ${{ needs.performance-tests.result }}"
+        echo "Backup Integration: ${{ needs.backup-integration.result }}"
+        echo "Snapshot Validation: ${{ needs.snapshot-validation.result }}"
+        echo "Cross-Platform: ${{ needs.cross-platform-compatibility.result }}"
+        echo "Edge Cases: ${{ needs.edge-case-validation.result }}"
+        echo "Security Scan: ${{ needs.security-scan.result }}"
+        
+        if [[ "${{ needs.test-matrix.result }}" == "failure" || 
+              "${{ needs.performance-tests.result }}" == "failure" || 
+              "${{ needs.backup-integration.result }}" == "failure" || 
+              "${{ needs.snapshot-validation.result }}" == "failure" || 
+              "${{ needs.cross-platform-compatibility.result }}" == "failure" || 
+              "${{ needs.edge-case-validation.result }}" == "failure" || 
+              "${{ needs.security-scan.result }}" == "failure" ]]; then
+          echo "❌ Some integration tests failed"
+          exit 1
+        else
+          echo "✅ All integration tests passed"
+        fi

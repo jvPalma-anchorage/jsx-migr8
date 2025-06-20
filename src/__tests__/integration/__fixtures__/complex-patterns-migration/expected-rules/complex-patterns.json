@@ -1,0 +1,177 @@
+{
+  "lookup": {},
+  "rules": [
+    {
+      "pattern": "Higher-Order Component",
+      "match": [],
+      "replaceWith": {
+        "code": "// Convert HOC to custom hook\nfunction useDataFetching<T>(url: string) {\n  const [data, setData] = useState<T | null>(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<string | null>(null);\n\n  useEffect(() => {\n    // fetch logic here\n  }, [url]);\n\n  return { data, loading, error };\n}\n\n// Usage:\nconst Component = (props) => {\n  const { data, loading, error } = useDataFetching('/api/data');\n  // component logic\n};",
+        "note": "HOCs should be converted to custom hooks for better composition and testing"
+      }
+    },
+    {
+      "pattern": "Render Props",
+      "match": [],
+      "replaceWith": {
+        "code": "// Convert render props to custom hook\nfunction useMousePosition() {\n  const [position, setPosition] = useState({ x: 0, y: 0 });\n\n  useEffect(() => {\n    const handleMouseMove = (event: MouseEvent) => {\n      setPosition({ x: event.clientX, y: event.clientY });\n    };\n    \n    window.addEventListener('mousemove', handleMouseMove);\n    return () => window.removeEventListener('mousemove', handleMouseMove);\n  }, []);\n\n  return position;\n}\n\n// Usage:\nconst Component = () => {\n  const mousePosition = useMousePosition();\n  return <div>Mouse: {mousePosition.x}, {mousePosition.y}</div>;\n};",
+        "note": "Render props should be converted to custom hooks for better reusability"
+      }
+    },
+    {
+      "pattern": "Compound Components",
+      "match": [],
+      "replaceWith": {
+        "code": "// Modern compound component with Context\nconst TabsContext = createContext(null);\n\nconst Tabs = ({ children, activeTab, onTabChange }) => {\n  return (\n    <TabsContext.Provider value={{ activeTab, onTabChange }}>\n      <div>{children}</div>\n    </TabsContext.Provider>\n  );\n};\n\nTabs.List = ({ children }) => {\n  return <div role=\"tablist\">{children}</div>;\n};\n\nTabs.Tab = ({ children, value }) => {\n  const { activeTab, onTabChange } = useContext(TabsContext);\n  return (\n    <button\n      role=\"tab\"\n      aria-selected={activeTab === value}\n      onClick={() => onTabChange(value)}\n    >\n      {children}\n    </button>\n  );\n};",
+        "note": "Compound components can use Context for implicit state sharing"
+      }
+    },
+    {
+      "pattern": "Function as Children",
+      "match": [],
+      "replaceWith": {
+        "code": "// Convert function as children to custom hook\nfunction useWindowSize() {\n  const [size, setSize] = useState({\n    width: window.innerWidth,\n    height: window.innerHeight\n  });\n\n  useEffect(() => {\n    const handleResize = () => {\n      setSize({\n        width: window.innerWidth,\n        height: window.innerHeight\n      });\n    };\n\n    window.addEventListener('resize', handleResize);\n    return () => window.removeEventListener('resize', handleResize);\n  }, []);\n\n  return size;\n}\n\n// Usage:\nconst Component = () => {\n  const { width, height } = useWindowSize();\n  return <div>Window: {width} × {height}</div>;\n};",
+        "note": "Function as children pattern should be converted to custom hooks"
+      }
+    },
+    {
+      "pattern": "Class Component with State",
+      "match": [],
+      "replaceWith": {
+        "code": "// Convert class component to functional component with hooks\nconst Component: React.FC<Props> = (props) => {\n  const [state, setState] = useState(initialState);\n  \n  useEffect(() => {\n    // componentDidMount logic\n    return () => {\n      // componentWillUnmount cleanup\n    };\n  }, []);\n  \n  useEffect(() => {\n    // componentDidUpdate logic\n  }, [/* dependencies */]);\n  \n  const handleMethod = useCallback(() => {\n    // method logic\n  }, [/* dependencies */]);\n  \n  return (\n    // JSX\n  );\n};",
+        "note": "Class components should be converted to functional components with hooks"
+      }
+    }
+  ],
+  "migrationStrategies": {
+    "hoc_to_hooks": {
+      "description": "Convert Higher-Order Components to custom hooks",
+      "steps": [
+        "1. Identify the logic provided by the HOC",
+        "2. Create a custom hook that encapsulates the same logic",
+        "3. Return the necessary state and functions from the hook",
+        "4. Replace HOC usage with hook calls in components",
+        "5. Remove the HOC wrapper"
+      ],
+      "benefits": [
+        "Better composition",
+        "Easier testing",
+        "No wrapper hell",
+        "Better TypeScript support",
+        "Clearer data flow"
+      ]
+    },
+    "render_props_to_hooks": {
+      "description": "Convert render props pattern to custom hooks",
+      "steps": [
+        "1. Extract the stateful logic from the render prop component",
+        "2. Create a custom hook that manages the same state",
+        "3. Return state and state updaters from the hook",
+        "4. Replace render prop usage with hook calls",
+        "5. Remove the render prop component"
+      ],
+      "benefits": [
+        "Simplified component tree",
+        "Better performance",
+        "Reusable logic",
+        "Cleaner syntax",
+        "Better dev tools support"
+      ]
+    },
+    "compound_components_modernization": {
+      "description": "Modernize compound components with Context and hooks",
+      "steps": [
+        "1. Create a Context for shared state",
+        "2. Use Context Provider in the root component",
+        "3. Use useContext in child components",
+        "4. Maintain the compound API structure",
+        "5. Add proper TypeScript types"
+      ],
+      "benefits": [
+        "Implicit state sharing",
+        "Better developer experience",
+        "Type safety",
+        "Flexible composition",
+        "No prop drilling"
+      ]
+    },
+    "function_as_children_to_hooks": {
+      "description": "Convert function as children to custom hooks",
+      "steps": [
+        "1. Extract the logic from the component",
+        "2. Create a custom hook with the same logic",
+        "3. Return the necessary values from the hook",
+        "4. Replace function as children with hook usage",
+        "5. Remove the wrapper component"
+      ],
+      "benefits": [
+        "Simpler API",
+        "Better composition",
+        "Reduced nesting",
+        "Improved readability",
+        "Better performance"
+      ]
+    }
+  },
+  "modernPatterns": {
+    "custom_hooks": {
+      "description": "Replace most patterns with custom hooks",
+      "examples": [
+        "useDataFetching",
+        "useLocalStorage",
+        "useWindowSize",
+        "useMousePosition",
+        "useFormValidation",
+        "useToggle",
+        "useAsync"
+      ]
+    },
+    "context_with_hooks": {
+      "description": "Use Context API with hooks for global state",
+      "examples": [
+        "useAuth",
+        "useTheme",
+        "useNotifications",
+        "useModal"
+      ]
+    },
+    "component_composition": {
+      "description": "Use component composition over inheritance",
+      "patterns": [
+        "Compound components with Context",
+        "Headless components",
+        "Render-only components",
+        "Container/Presenter pattern"
+      ]
+    }
+  },
+  "antiPatterns": {
+    "avoid": [
+      "Deeply nested HOCs",
+      "Complex render prop chains",
+      "Overuse of Context",
+      "Massive custom hooks",
+      "Props drilling through many levels"
+    ],
+    "prefer": [
+      "Simple custom hooks",
+      "Context for truly global state",
+      "Component composition",
+      "Prop passing for local state",
+      "Separation of concerns"
+    ]
+  },
+  "performance_considerations": {
+    "hooks": [
+      "Use useCallback for event handlers",
+      "Use useMemo for expensive calculations",
+      "Split state into multiple useState calls",
+      "Use useReducer for complex state logic"
+    ],
+    "context": [
+      "Split contexts by concern",
+      "Use React.memo to prevent unnecessary re-renders",
+      "Optimize context value creation",
+      "Consider state management libraries for complex state"
+    ]
+  }
+}

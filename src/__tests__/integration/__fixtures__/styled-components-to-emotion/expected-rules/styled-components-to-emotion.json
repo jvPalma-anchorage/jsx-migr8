@@ -1,0 +1,287 @@
+{
+  "lookup": {
+    "styled-components": {
+      "default": ["@emotion/styled", "default"],
+      "ThemeProvider": ["@emotion/react", "ThemeProvider"],
+      "createGlobalStyle": ["@emotion/react", "Global"],
+      "css": ["@emotion/react", "css"],
+      "keyframes": ["@emotion/react", "keyframes"]
+    },
+    "polished": {
+      "darken": ["polished", "darken"],
+      "lighten": ["polished", "lighten"],
+      "rgba": ["polished", "rgba"],
+      "transparentize": ["polished", "transparentize"]
+    }
+  },
+  "rules": [
+    {
+      "import": "styled",
+      "match": [],
+      "rename": {
+        "styled": "styled"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "ThemeProvider",
+      "match": [],
+      "rename": {
+        "ThemeProvider": "ThemeProvider"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/react"
+    },
+    {
+      "function": "createGlobalStyle",
+      "match": [],
+      "rename": {
+        "createGlobalStyle": "Global"
+      },
+      "replaceWith": {
+        "code": "const GlobalStyle = () => (\n  <Global\n    styles={css`\n      {STYLES_CONTENT}\n    `}\n  />\n);",
+        "note": "createGlobalStyle becomes Global component with css prop"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/react"
+    },
+    {
+      "function": "css",
+      "match": [],
+      "rename": {
+        "css": "css"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/react"
+    },
+    {
+      "function": "keyframes",
+      "match": [],
+      "rename": {
+        "keyframes": "keyframes"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/react"
+    },
+    {
+      "component": "styled.div",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.div`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.button",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.button`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.input",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.input`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.form",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.form`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.span",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.span`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.a",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.a`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.header",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.header`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.nav",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.nav`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.ul",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.ul`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.li",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.li`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.h1",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.h1`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.h2",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.h2`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.h3",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.h3`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.p",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.p`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.label",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.label`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.textarea",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.textarea`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    },
+    {
+      "component": "styled.select",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName = styled.select`\n  {STYLES_CONTENT}\n`;",
+        "note": "styled-components syntax remains the same in Emotion"
+      },
+      "importFrom": "styled-components",
+      "importTo": "@emotion/styled"
+    }
+  ],
+  "transformations": {
+    "theme_access": {
+      "from": "props => props.theme.colors.primary",
+      "to": "theme => theme.colors.primary",
+      "note": "Emotion uses theme parameter directly instead of props.theme"
+    },
+    "global_styles": {
+      "from": "createGlobalStyle`...`",
+      "to": "<Global styles={css`...`} />",
+      "note": "Global styles are now components with css prop"
+    },
+    "css_prop": {
+      "from": "css`...`",
+      "to": "css`...`",
+      "note": "css helper function syntax remains the same"
+    },
+    "keyframes": {
+      "from": "keyframes`...`",
+      "to": "keyframes`...`",
+      "note": "keyframes syntax remains the same"
+    }
+  },
+  "packageDependencies": {
+    "remove": [
+      "styled-components",
+      "@types/styled-components"
+    ],
+    "add": [
+      "@emotion/react",
+      "@emotion/styled"
+    ]
+  },
+  "additionalSetup": {
+    "babel": {
+      "note": "Add @emotion/babel-plugin to babel config",
+      "config": {
+        "plugins": ["@emotion/babel-plugin"]
+      }
+    },
+    "typescript": {
+      "note": "Add emotion jsx pragma for TypeScript",
+      "config": {
+        "compilerOptions": {
+          "jsx": "react-jsx",
+          "jsxImportSource": "@emotion/react"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "name": "Class Components to Hooks",
+  "description": "Converts React class components to functional components with hooks",
+  "lookup": {
+    "react": ["Component", "PureComponent"],
+    "react-redux": ["connect"],
+    "react-router-dom": ["withRouter", "RouteComponentProps"]
+  },
+  "transformations": [
+    {
+      "type": "class_to_function",
+      "pattern": "class {componentName} extends Component",
+      "replacement": "const {componentName}: React.FC<{propsInterface}> = (props) => {",
+      "hooks": [
+        {
+          "lifecycle": "constructor",
+          "hook": "useState",
+          "pattern": "this.state = {stateObject}",
+          "replacement": "const [state, setState] = useState({stateObject})"
+        },
+        {
+          "lifecycle": "componentDidMount",
+          "hook": "useEffect",
+          "pattern": "componentDidMount() { {body} }",
+          "replacement": "useEffect(() => { {body} }, [])"
+        },
+        {
+          "lifecycle": "componentDidUpdate",
+          "hook": "useEffect",
+          "pattern": "componentDidUpdate(prevProps, prevState) { {body} }",
+          "replacement": "useEffect(() => { {body} })"
+        },
+        {
+          "lifecycle": "componentWillUnmount",
+          "hook": "useEffect",
+          "pattern": "componentWillUnmount() { {body} }",
+          "replacement": "useEffect(() => { return () => { {body} } }, [])"
+        }
+      ]
+    },
+    {
+      "type": "pure_component_to_memo",
+      "pattern": "class {componentName} extends PureComponent",
+      "replacement": "const {componentName} = React.memo<{propsInterface}>(({props}) => {"
+    },
+    {
+      "type": "connect_to_hooks",
+      "pattern": "connect(mapStateToProps, mapDispatchToProps)",
+      "replacement": {
+        "imports": ["useSelector", "useDispatch"],
+        "code": [
+          "const selector = useSelector((state) => mapStateToProps(state));",
+          "const dispatch = useDispatch();"
+        ]
+      }
+    },
+    {
+      "type": "with_router_to_hooks",
+      "pattern": "withRouter({component})",
+      "replacement": {
+        "imports": ["useNavigate", "useLocation", "useParams"],
+        "removeHOC": true
+      }
+    }
+  ],
+  "stateTransformations": [
+    {
+      "pattern": "this.state.{property}",
+      "replacement": "{property}",
+      "requiresStateDestructuring": true
+    },
+    {
+      "pattern": "this.setState({ {updates} })",
+      "replacement": "set{Property}({value})",
+      "generateSetters": true
+    },
+    {
+      "pattern": "this.setState(prevState => ({ {updates} }))",
+      "replacement": "set{Property}(prev => ({ ...prev, {updates} }))"
+    }
+  ],
+  "methodTransformations": [
+    {
+      "pattern": "{methodName} = () => {",
+      "replacement": "const {methodName} = useCallback(() => {",
+      "addDependencies": true,
+      "closingReplacement": "}, [dependencies]);"
+    },
+    {
+      "pattern": "{methodName}({params}) {",
+      "replacement": "const {methodName} = useCallback(({params}) => {",
+      "addDependencies": true,
+      "closingReplacement": "}, [dependencies]);"
+    }
+  ],
+  "propTransformations": [
+    {
+      "pattern": "this.props.{property}",
+      "replacement": "{property}",
+      "requiresPropsDestructuring": true
+    }
+  ],
+  "customTransformations": [
+    {
+      "pattern": "render() {",
+      "replacement": "",
+      "description": "Remove render method wrapper"
+    },
+    {
+      "pattern": "return (",
+      "replacement": "return (",
+      "description": "Keep return statement"
+    }
+  ],
+  "importTransformations": [
+    {
+      "from": "react-redux",
+      "remove": ["connect"],
+      "add": ["useSelector", "useDispatch"]
+    },
+    {
+      "from": "react-router-dom",
+      "remove": ["withRouter", "RouteComponentProps"],
+      "add": ["useNavigate", "useLocation", "useParams"]
+    },
+    {
+      "from": "react",
+      "remove": ["Component", "PureComponent"],
+      "add": ["useState", "useEffect", "useCallback", "useRef", "useMemo"]
+    }
+  ]
+}

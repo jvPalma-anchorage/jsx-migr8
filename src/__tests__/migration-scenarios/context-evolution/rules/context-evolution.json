@@ -1,0 +1,198 @@
+{
+  "name": "Context API Evolution",
+  "description": "Migrates legacy Context API to modern React Context with hooks",
+  "lookup": {
+    "react": ["Component", "createContext"],
+    "prop-types": ["PropTypes"]
+  },
+  "transformations": [
+    {
+      "type": "legacy_context_to_modern",
+      "patterns": [
+        {
+          "pattern": "static childContextTypes = { {contextTypes} };",
+          "replacement": "// Removed: childContextTypes no longer needed",
+          "action": "remove"
+        },
+        {
+          "pattern": "static contextTypes = { {contextTypes} };",
+          "replacement": "// Removed: contextTypes no longer needed",
+          "action": "remove"
+        },
+        {
+          "pattern": "getChildContext() { return { {contextValue} }; }",
+          "replacement": "// Converted to Context Provider",
+          "action": "convert_to_provider"
+        }
+      ]
+    },
+    {
+      "type": "class_to_functional_provider",
+      "pattern": "class {ProviderName} extends Component",
+      "replacement": "const {ProviderName}: React.FC<{ children: ReactNode; {props} }> = ({ children, {props} }) => {",
+      "steps": [
+        {
+          "action": "create_context",
+          "pattern": "const {ContextName} = createContext<{ContextType} | null>(null);"
+        },
+        {
+          "action": "convert_state_to_hooks",
+          "pattern": "const [state, setState] = useState({initialState});"
+        },
+        {
+          "action": "convert_methods_to_callbacks",
+          "pattern": "const {methodName} = useCallback(({params}) => { {body} }, [dependencies]);"
+        },
+        {
+          "action": "memoize_context_value",
+          "pattern": "const value = useMemo(() => ({ {contextValue} }), [dependencies]);"
+        },
+        {
+          "action": "return_provider",
+          "pattern": "return <{ContextName}.Provider value={value}>{children}</{ContextName}.Provider>;"
+        }
+      ]
+    },
+    {
+      "type": "create_custom_hook",
+      "pattern": "const use{HookName} = (): {ReturnType} => {",
+      "steps": [
+        {
+          "action": "use_context",
+          "pattern": "const context = useContext({ContextName});"
+        },
+        {
+          "action": "error_handling",
+          "pattern": "if (!context) { throw new Error('use{HookName} must be used within a {ProviderName}'); }"
+        },
+        {
+          "action": "return_context",
+          "pattern": "return context;"
+        }
+      ]
+    },
+    {
+      "type": "consumer_to_hook",
+      "pattern": "static contextTypes = { {contextTypes} };",
+      "replacement": "const { {contextValues} } = use{HookName}();",
+      "steps": [
+        {
+          "action": "remove_context_types",
+          "pattern": "static contextTypes"
+        },
+        {
+          "action": "remove_context_property",
+          "pattern": "context!: {contextType};"
+        },
+        {
+          "action": "add_hook_usage",
+          "pattern": "const context = use{HookName}();"
+        },
+        {
+          "action": "replace_context_access",
+          "pattern": "this.context.{property}",
+          "replacement": "context.{property}"
+        }
+      ]
+    }
+  ],
+  "classToFunctionalTransformations": [
+    {
+      "pattern": "class {ComponentName} extends Component",
+      "replacement": "const {ComponentName}: React.FC<{PropsType}> = ({props}) => {",
+      "steps": [
+        {
+          "action": "convert_context_usage",
+          "pattern": "const context = use{HookName}();"
+        },
+        {
+          "action": "extract_context_values",
+          "pattern": "const { {values} } = context;"
+        },
+        {
+          "action": "convert_methods_to_functions",
+          "pattern": "const {methodName} = ({params}) => { {body} };"
+        },
+        {
+          "action": "return_jsx",
+          "pattern": "return ( {jsx} );"
+        }
+      ]
+    }
+  ],
+  "importTransformations": [
+    {
+      "from": "prop-types",
+      "action": "remove_if_unused",
+      "replacement": "// PropTypes no longer needed with TypeScript and modern Context"
+    },
+    {
+      "from": "react",
+      "add": [
+        "useContext",
+        "useState", 
+        "useCallback",
+        "useMemo",
+        "useReducer",
+        "ReactNode"
+      ]
+    }
+  ],
+  "patternReplacements": [
+    {
+      "pattern": "this.context.{property}",
+      "replacement": "{property}",
+      "description": "Replace context property access with destructured hook value"
+    },
+    {
+      "pattern": "PropTypes.{type}",
+      "replacement": "// TypeScript types used instead",
+      "description": "Remove PropTypes in favor of TypeScript"
+    },
+    {
+      "pattern": "getChildContext()",
+      "replacement": "// Replaced with Context Provider value prop",
+      "description": "Legacy method no longer needed"
+    }
+  ],
+  "optimizationPatterns": [
+    {
+      "pattern": "useMemo(() => ({ {contextValue} }), [dependencies])",
+      "description": "Memoize context value to prevent unnecessary re-renders"
+    },
+    {
+      "pattern": "useCallback(({params}) => { {body} }, [dependencies])",
+      "description": "Memoize context methods to prevent unnecessary re-renders"
+    },
+    {
+      "pattern": "const use{Name}Selector = <T,>(selector: (state: {StateType}) => T): T => {",
+      "description": "Add selector-based hooks for performance optimization"
+    }
+  ],
+  "contextCombinationPatterns": [
+    {
+      "pattern": "const AppProviders: React.FC<{ children: ReactNode; {props} }> = ({ children, {props} }) => {",
+      "description": "Combine multiple providers into a single component for better DX"
+    },
+    {
+      "pattern": "const use{Combined} = () => { return { ...use{Context1}(), ...use{Context2}() }; }",
+      "description": "Create combined hooks for accessing multiple contexts"
+    }
+  ],
+  "typeDefinitions": [
+    {
+      "pattern": "interface {ContextName}Type { {properties} }",
+      "description": "Define TypeScript interfaces for context types"
+    },
+    {
+      "pattern": "const {ContextName} = createContext<{ContextType} | null>(null);",
+      "description": "Type context with null union for error handling"
+    }
+  ],
+  "errorHandling": [
+    {
+      "pattern": "if (!context) { throw new Error('use{Hook} must be used within a {Provider}'); }",
+      "description": "Add runtime error checking for context usage"
+    }
+  ]
+}

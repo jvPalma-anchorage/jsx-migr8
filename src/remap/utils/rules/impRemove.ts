@@ -1,5 +1,6 @@
 import { types as T, print, visit } from "recast";
 import { MigrationMapper } from "../../../migrator/types";
+import { getSpecifierLocalName, getSpecifierImportedName, isImportSpecifier } from "../../../types/ast";
 
 export const impRemove = (
   ast: T.ASTNode,
@@ -25,34 +26,12 @@ export const impRemove = (
 
       // 1. drop current specifier
       decl.specifiers = decl.specifiers?.filter((sp) => {
-        const specLocName = (sp as any).local.name as string;
+        const specLocName = getSpecifierLocalName(sp);
 
         if (sp.type === "ImportSpecifier" && importType === "named") {
-          // console.log("==========================", {
-          //   //* specImpName: 'Text',
-          //   specImpName: (sp.imported as any).name,
-          //   //? specLocName: 'Text',
-          //   specLocName,
-          //   //* localName: 'Text',
-          //   localName,
-          //   //? importedName: 'Text',
-          //   importedName,
-          //   //? importType: 'named'
-          //   importType,
-          // });
-          return (sp.imported as any).name !== compLookupName;
+          return isImportSpecifier(sp) ? getSpecifierImportedName(sp) !== compLookupName : true;
         }
         if (sp.type === "ImportDefaultSpecifier" && importType === "default") {
-          // console.log("==========================", {
-          //*   // specLocName: 'Text',
-          //   specLocName,
-          //*   // localName: 'Text',
-          //   localName,
-          //?   // importedName: 'default',
-          //   importedName,
-          //?   // importType: 'default'
-          //   importType,
-          // });
           return specLocName !== localName;
         }
         return true;

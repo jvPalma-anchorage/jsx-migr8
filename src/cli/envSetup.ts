@@ -5,6 +5,14 @@ import { input, confirm } from "@inquirer/prompts";
 import { default as chalk } from "chalk";
 import { readdirSync, statSync, writeFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { 
+  validateRootPath, 
+  validateBlacklist, 
+  PathValidationError, 
+  formatPathError,
+  expandHomePath,
+  isPathSafeForScanning
+} from "../utils/path-validation";
 
 /**
  * Smart blacklist detection patterns - commonly ignored directories
@@ -79,20 +87,31 @@ function detectBlacklistDirectories(rootPath: string): string[] {
 }
 
 /**
- * Validate that the provided path exists and is a directory
+ * Enhanced path validation for environment setup
  */
-function validatePath(inputPath: string): boolean | string {
+function validatePathForSetup(inputPath: string): boolean | string {
   try {
-    const resolvedPath = resolve(inputPath);
-    const stats = statSync(resolvedPath);
-
-    if (!stats.isDirectory()) {
-      return "Path must be a directory";
+    // Expand home directory if needed
+    const expandedPath = expandHomePath(inputPath.trim());
+    
+    // Check if path is safe for scanning
+    if (!isPathSafeForScanning(expandedPath)) {
+      return "Path is not safe for scanning (system directory detected). Please choose a project directory.";
     }
-
+    
+    // Use comprehensive path validation
+    const validation = validateRootPath(expandedPath);
+    
+    if (!validation.valid) {
+      return validation.error!.message;
+    }
+    
     return true;
   } catch (error) {
-    return "Path does not exist or is not accessible";
+    if (error instanceof PathValidationError) {
+      return error.message;
+    }
+    return `Path validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
   }
 }
 
@@ -124,18 +143,42 @@ export async function setupEnvironment(): Promise<void> {
     rootPath = await input({
       message: "Enter the root path to scan for JSX components:",
       default: process.cwd(),
-      validate: validatePath,
+      validate: validatePathForSetup,
+      transformer: (input: string) => {
+        // Show the expanded/resolved path preview
+        if (input.trim()) {
+          const expanded = expandHomePath(input.trim());
+          const resolved = resolve(expanded);
+          return `${input} → ${resolved}`;
+        }
+        return input;
+      }
     });
   } catch (error) {
-    console.error(chalk.red("Setup cancelled by user"));
+    console.error(chalk.red("\n❌ Setup cancelled by user"));
+    console.error(chalk.gray("You can run jsx-migr8 again to retry setup or create a .env file manually."));
+    console.error(chalk.gray("Example .env file content:"));
+    console.error(chalk.gray("ROOT_PATH=/path/to/your/project"));
+    console.error(chalk.gray("BLACKLIST=node_modules,.git,dist,build"));
     process.exit(1);
   }
 
-  const resolvedRootPath = resolve(rootPath);
+  // Expand and resolve the root path
+  const expandedRootPath = expandHomePath(rootPath);
+  const resolvedRootPath = resolve(expandedRootPath);
 
-  // Step 2: Detect common blacklist directories
+  // Step 2: Detect common blacklist directories with enhanced validation
   console.log(chalk.gray("\n🔍 Detecting common directories to ignore..."));
   const detectedBlacklist = detectBlacklistDirectories(resolvedRootPath);
+  
+  // Validate the detected blacklist
+  const blacklistValidation = validateBlacklist(detectedBlacklist, resolvedRootPath);
+  if (!blacklistValidation.valid) {
+    console.warn(chalk.yellow("⚠️ Some detected directories may have issues:"));
+    blacklistValidation.invalidEntries.forEach(invalid => {
+      console.warn(chalk.gray(`   • "${invalid.entry}": ${invalid.reason}`));
+    });
+  }
 
   let blacklistDirs: string[];
 
@@ -172,13 +215,26 @@ export async function setupEnvironment(): Promise<void> {
     const customBlacklist = await input({
       message: "Enter additional directories to ignore (comma-separated):",
       validate: (input: string) => {
+        if (!input.trim()) {
+          return true; // Empty input is allowed
+        }
+        
         const dirs = input
           .split(",")
           .map((d) => d.trim())
           .filter((d) => d.length > 0);
-        if (dirs.length === 0 && input.trim().length > 0) {
+          
+        if (dirs.length === 0) {
           return "Please provide valid directory names separated by commas";
         }
+        
+        // Validate the custom blacklist entries
+        const customValidation = validateBlacklist(dirs);
+        if (!customValidation.valid) {
+          const firstError = customValidation.invalidEntries[0];
+          return `Invalid entry "${firstError.entry}": ${firstError.reason}`;
+        }
+        
         return true;
       },
     });
@@ -188,7 +244,18 @@ export async function setupEnvironment(): Promise<void> {
         .split(",")
         .map((d) => d.trim())
         .filter((d) => d.length > 0);
-      blacklistDirs = [...blacklistDirs, ...customDirs];
+        
+      // Validate the custom directories before adding
+      const customValidation = validateBlacklist(customDirs);
+      if (customValidation.valid) {
+        blacklistDirs = [...blacklistDirs, ...customValidation.validEntries];
+      } else {
+        console.warn(chalk.yellow("⚠️ Some custom entries were invalid and ignored:"));
+        customValidation.invalidEntries.forEach(invalid => {
+          console.warn(chalk.gray(`   • "${invalid.entry}": ${invalid.reason}`));
+        });
+        blacklistDirs = [...blacklistDirs, ...customValidation.validEntries];
+      }
     }
   }
 
@@ -259,9 +326,11 @@ export async function ensureEnvironmentSetup(): Promise<void> {
 
   if (!shouldSetup) {
     console.log(chalk.red("\n❌ .env file is required to continue."));
-    console.log(
-      chalk.gray("You can create one manually or run the setup later."),
-    );
+    console.log(chalk.gray("You can create one manually with the following content:"));
+    console.log(chalk.gray("\n# Example .env file"));
+    console.log(chalk.cyan("ROOT_PATH=/path/to/your/project"));
+    console.log(chalk.cyan("BLACKLIST=node_modules,.git,dist,build,out,.next,.cache"));
+    console.log(chalk.gray("\nOr run jsx-migr8 again to use the interactive setup."));
     process.exit(1);
   }
 

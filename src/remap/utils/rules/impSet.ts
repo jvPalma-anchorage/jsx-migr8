@@ -2,12 +2,13 @@
 /*  Single-pass migrate + dry-run diff                                       */
 /* ------------------------------------------------------------------------- */
 import { types as T, visit } from "recast";
+import { ASTFile } from "../../../types/ast";
 
 /* ---------- load remap rules (your generator returns the full map) -------- */
 
 export const impSet = (ast: T.ASTNode, compName: string, newImport: string) => {
   let targetFound = false;
-  visit(ast as any, {
+  visit(ast, {
     visitImportDeclaration(pp) {
       if (
         pp.node.source.value === newImport &&
@@ -24,6 +25,9 @@ export const impSet = (ast: T.ASTNode, compName: string, newImport: string) => {
     // Adding the import declaration to the beginning of the program body
     const decl = b.importDeclaration([spec], b.stringLiteral(newImport));
 
-    (ast as any).program.body.unshift(decl);
+    const program = (ast as ASTFile).program;
+    if (program && program.body) {
+      program.body.unshift(decl);
+    }
   }
 };

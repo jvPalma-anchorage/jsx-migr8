@@ -1,0 +1,108 @@
+{
+  "name": "React Router v5 to v6",
+  "description": "Migrates React Router v5 components and hooks to v6",
+  "lookup": {
+    "react-router-dom": ["Switch", "Route", "Redirect", "useHistory", "withRouter", "RouteComponentProps"]
+  },
+  "components": [
+    {
+      "componentName": "Switch",
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom",
+      "replaceWith": {
+        "componentName": "Routes",
+        "code": "<Routes>{CHILDREN}</Routes>"
+      }
+    },
+    {
+      "componentName": "Route",
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom",
+      "conditions": [
+        {
+          "match": [{ "component": "*", "exact": true }],
+          "remove": ["component", "exact"],
+          "set": { "index": true, "element": "<{component} />" },
+          "replaceWith": {
+            "code": "<Route index element={<{component} />} {...OUTER_PROPS} />"
+          }
+        },
+        {
+          "match": [{ "component": "*" }],
+          "remove": ["component"],
+          "set": { "element": "<{component} />" },
+          "replaceWith": {
+            "code": "<Route element={<{component} />} {...OUTER_PROPS} />"
+          }
+        }
+      ]
+    },
+    {
+      "componentName": "Redirect",
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom",
+      "replaceWith": {
+        "componentName": "Navigate",
+        "rename": { "from": "path" },
+        "set": { "replace": true },
+        "code": "<Navigate {...OUTER_PROPS} replace />"
+      }
+    }
+  ],
+  "hooks": [
+    {
+      "hookName": "useHistory",
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom",
+      "replaceWith": {
+        "hookName": "useNavigate",
+        "transformations": {
+          "history.push": "navigate",
+          "history.replace": "navigate(path, { replace: true })",
+          "history.goBack": "navigate(-1)",
+          "history.goForward": "navigate(1)"
+        }
+      }
+    }
+  ],
+  "hocs": [
+    {
+      "hocName": "withRouter",
+      "importFrom": "react-router-dom",
+      "removeImport": true,
+      "transformation": {
+        "type": "convert_to_hooks",
+        "hooks": ["useNavigate", "useLocation", "useParams"],
+        "removeProps": ["history", "location", "match"]
+      }
+    }
+  ],
+  "types": [
+    {
+      "typeName": "RouteComponentProps",
+      "importFrom": "react-router-dom",
+      "removeImport": true,
+      "transformation": {
+        "type": "remove_interface_extension",
+        "replaceWithCustomProps": true
+      }
+    }
+  ],
+  "customTransformations": [
+    {
+      "pattern": "location.state",
+      "replacement": "location.state as T",
+      "description": "Add type assertion for location.state"
+    },
+    {
+      "pattern": "match.path",
+      "replacement": "/* match.path not available in v6 - use relative paths */",
+      "description": "Remove match.path usage"
+    },
+    {
+      "pattern": "match.url",
+      "replacement": "/* match.url not available in v6 - use relative paths */",
+      "description": "Remove match.url usage"
+    }
+  ]
+}

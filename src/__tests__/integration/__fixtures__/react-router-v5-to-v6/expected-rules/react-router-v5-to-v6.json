@@ -1,0 +1,154 @@
+{
+  "lookup": {
+    "react-router-dom": {
+      "Switch": ["react-router-dom", "Routes"],
+      "useHistory": ["react-router-dom", "useNavigate"],
+      "useRouteMatch": ["react-router-dom", "useMatch"],
+      "Redirect": ["react-router-dom", "Navigate"],
+      "withRouter": [null, null],
+      "Prompt": [null, null]
+    },
+    "history": {
+      "createBrowserHistory": [null, null]
+    }
+  },
+  "rules": [
+    {
+      "component": "Switch",
+      "match": [],
+      "rename": {
+        "Switch": "Routes"
+      },
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom"
+    },
+    {
+      "component": "Route",
+      "match": [],
+      "remove": ["exact", "component", "render"],
+      "rename": {
+        "path": "path"
+      },
+      "set": {
+        "element": "{CHILDREN}"
+      },
+      "replaceWith": {
+        "code": "<Route path=\"{PATH}\" element={<Component />} />",
+        "note": "Route children should be wrapped in element prop"
+      },
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom"
+    },
+    {
+      "component": "Redirect",
+      "match": [],
+      "rename": {
+        "Redirect": "Navigate",
+        "to": "to"
+      },
+      "set": {
+        "replace": true
+      },
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom"
+    },
+    {
+      "hook": "useHistory",
+      "match": [],
+      "rename": {
+        "useHistory": "useNavigate"
+      },
+      "replaceWith": {
+        "code": "const navigate = useNavigate();\n// Replace history.push() with navigate()\n// Replace history.replace() with navigate(path, { replace: true })\n// Replace history.goBack() with navigate(-1)\n// Replace history.goForward() with navigate(1)",
+        "note": "useHistory is replaced with useNavigate. Update method calls accordingly."
+      },
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom"
+    },
+    {
+      "hook": "useRouteMatch",
+      "match": [],
+      "rename": {
+        "useRouteMatch": "useMatch"
+      },
+      "replaceWith": {
+        "code": "// useRouteMatch() with no args becomes useLocation() + useResolvedPath()\n// useRouteMatch(path) becomes useMatch(path)\nconst match = useMatch(pattern);",
+        "note": "useRouteMatch is replaced with useMatch for specific patterns, or useLocation for current route info"
+      },
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom"
+    },
+    {
+      "function": "withRouter",
+      "match": [],
+      "replaceWith": {
+        "code": "// withRouter HOC is removed. Use hooks instead:\n// const navigate = useNavigate();\n// const location = useLocation();\n// const params = useParams();",
+        "note": "withRouter HOC is removed. Use hooks (useNavigate, useLocation, useParams) inside functional components."
+      },
+      "importFrom": "react-router-dom",
+      "importTo": null
+    },
+    {
+      "component": "Prompt",
+      "match": [],
+      "replaceWith": {
+        "code": "// Prompt component is removed in v6.\n// Consider using a custom solution with beforeunload event or state management.",
+        "note": "Prompt component is removed. Implement custom navigation blocking if needed."
+      },
+      "importFrom": "react-router-dom",
+      "importTo": null
+    },
+    {
+      "component": "NavLink",
+      "match": [],
+      "remove": ["activeStyle", "activeClassName"],
+      "set": {
+        "className": "({ isActive }) => isActive ? 'active' : ''"
+      },
+      "replaceWith": {
+        "code": "<NavLink to=\"{TO}\" className={({ isActive }) => isActive ? 'active' : ''} {...OUTER_PROPS}>{CHILDREN}</NavLink>",
+        "note": "activeStyle and activeClassName are replaced with function-based className and style props"
+      },
+      "importFrom": "react-router-dom",
+      "importTo": "react-router-dom"
+    },
+    {
+      "import": "createBrowserHistory",
+      "match": [],
+      "replaceWith": {
+        "code": "// Custom history is no longer needed in v6.\n// Remove createBrowserHistory and use BrowserRouter directly.",
+        "note": "Custom history creation is removed. BrowserRouter manages history internally."
+      },
+      "importFrom": "history",
+      "importTo": null
+    }
+  ],
+  "methodReplacements": {
+    "history.push": "navigate",
+    "history.replace": "navigate(path, { replace: true })",
+    "history.goBack": "navigate(-1)",
+    "history.goForward": "navigate(1)",
+    "history.block": "// Not available in v6, implement custom solution",
+    "match.url": "// Use useResolvedPath() or pathname",
+    "match.path": "// Use pattern from useMatch()",
+    "match.params": "// Use useParams()",
+    "match.isExact": "// Not available in v6"
+  },
+  "propChanges": {
+    "Route": {
+      "exact": "removed",
+      "component": "use element prop instead",
+      "render": "use element prop instead",
+      "children": "wrap in element prop"
+    },
+    "NavLink": {
+      "activeStyle": "use style function",
+      "activeClassName": "use className function"
+    },
+    "Redirect": {
+      "to": "same in Navigate",
+      "push": "use replace={false}",
+      "from": "removed"
+    }
+  }
+}

@@ -1,19 +1,21 @@
 import chalk from "chalk";
 import { print } from "recast";
-import { getContext } from "../context/globalContext";
+import { getContext, lWarning } from "../context/globalContext";
 import { ImportDetails, ImportPath, ImportSpecifierDetails } from "../types";
+import { getSpecifierLocalName, getSpecifierImportedName, isImportSpecifier } from "../types/ast";
 
 export const getImportDetails = (
   path: ImportPath,
   filePath: string,
 ): null | ImportDetails => {
-  const { PACKAGES, TARGET_COMPONENT } = getContext();
-  const impNode = path.node;
-  const packageName = impNode.source.value as string;
+  try {
+    const { PACKAGES, TARGET_COMPONENT } = getContext();
+    const impNode = path.node;
+    const packageName = impNode.source.value as string;
 
-  if (!PACKAGES.some((e) => e === packageName)) return null;
+    if (!PACKAGES.some((e) => e === packageName)) return null;
 
-  const initialSpecifiersList: ImportSpecifierDetails[] = [];
+    const initialSpecifiersList: ImportSpecifierDetails[] = [];
 
   return {
     node: impNode,
@@ -21,7 +23,7 @@ export const getImportDetails = (
     specifiers:
       impNode.specifiers?.reduce((acc, spec) => {
         const { type, local } = spec;
-        const localName = (local as any).name as string;
+        const localName = getSpecifierLocalName(spec);
 
         // * not the component we are looking for
         if (!localName || localName !== TARGET_COMPONENT) {
@@ -29,8 +31,8 @@ export const getImportDetails = (
         }
 
         const importedName: ImportSpecifierDetails["importedName"] =
-          type === "ImportSpecifier"
-            ? (spec.imported as any).name
+          type === "ImportSpecifier" && isImportSpecifier(spec)
+            ? getSpecifierImportedName(spec)
             : type === "ImportDefaultSpecifier"
               ? "default"
               : undefined;
@@ -42,23 +44,33 @@ export const getImportDetails = (
               : undefined;
 
         if (!importType) {
-          console.warn(chalk.yellow("\t\t Import type unhandled: "), type);
+          lWarning(`Import type unhandled in ${filePath}:`, type);
         }
 
-        acc.push({
-          filePath,
-          type,
-          importType,
-          importStm: print(impNode)
+        try {
+          const importStm = print(impNode)
             .code.replaceAll(",\n}", " }")
-            .replaceAll("\n  ", " "),
-          localName, // local
-          importedName, // name
-          astImportPath: path,
-        });
+            .replaceAll("\n  ", " ");
+          
+          acc.push({
+            filePath,
+            type,
+            importType,
+            importStm,
+            localName, // local
+            importedName, // name
+            astImportPath: path,
+          });
+        } catch (error) {
+          lWarning(`Failed to process import specifier in ${filePath}:`, error as any);
+        }
         return acc;
       }, initialSpecifiersList) || initialSpecifiersList,
-  };
+    };
+  } catch (error) {
+    lWarning(`Failed to get import details for ${filePath}:`, error as any);
+    return null;
+  }
 };
 
 export const checkIfJsxInImportsReport = (
@@ -100,19 +112,27 @@ export const analyzeImportDeclaration = (
   path: ImportPath,
   filePath: string,
 ) => {
-  const { report } = getContext();
+  try {
+    const { report } = getContext();
 
-  const importDetails = getImportDetails(path, filePath);
+    const importDetails = getImportDetails(path, filePath);
 
-  if (!importDetails) {
-    return;
-  }
-
-  importDetails.specifiers.forEach((specDetails) => {
-    if (!!report[importDetails.packageName]._imports) {
-      report[importDetails.packageName]._imports!.push(specDetails);
-    } else {
-      report[importDetails.packageName]._imports = [specDetails];
+    if (!importDetails) {
+      return;
     }
-  });
+
+    importDetails.specifiers.forEach((specDetails) => {
+      try {
+        if (!!report[importDetails.packageName]._imports) {
+          report[importDetails.packageName]._imports!.push(specDetails);
+        } else {
+          report[importDetails.packageName]._imports = [specDetails];
+        }
+      } catch (error) {
+        lWarning(`Failed to add import specifier to report for ${filePath}:`, error as any);
+      }
+    });
+  } catch (error) {
+    lWarning(`Failed to analyze import declaration in ${filePath}:`, error as any);
+  }
 };

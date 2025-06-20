@@ -1,6 +1,7 @@
 import { getContext, lWarning } from "@/context/globalContext";
 import { MigrationMapper } from "@/migrator/types";
 import { Migr8Spec } from "@/report";
+import { RemapRule } from "@/remap/base-remapper";
 import { print, visit } from "recast";
 import { propRemove } from "./propRemove";
 import { propSet } from "./propSet";
@@ -53,7 +54,7 @@ export const applyRemapRule = (
     if (rule.replaceWith !== undefined) {
       changed();
       handleReplaceWithJsx(changeCode, {
-        rule: rule as any, // this is OK, im tired.
+        rule: rule as RemapRule & { replaceWith: NonNullable<RemapRule['replaceWith']> },
         elem,
         compName: locName,
         filePath: fileAbsPath,

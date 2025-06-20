@@ -1,0 +1,21 @@
+{
+  "name": "antd-v3-to-v4-migration",
+  "version": "1.0.0",
+  "description": "Complex Ant Design v3 to v4 migration test scenario",
+  "main": "src/index.tsx",
+  "dependencies": {
+    "antd": "^3.26.20",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^4.9.5",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  }
+}

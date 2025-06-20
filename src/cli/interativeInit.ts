@@ -7,6 +7,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { GlobalState } from "../types";
 import { makeDiff } from "../utils/diff";
+import { 
+  secureComponentNameInput, 
+  securePackageNameInput, 
+  secureSelect,
+  securePackageCollection 
+} from "./secure-prompts";
+import { logSecurityEvent, sanitizers } from "../validation";
 
 export const showCompSpecDiff = (
   {
@@ -69,22 +76,28 @@ export const Demo = () => (
 export const wizard = async (ctx: GlobalState) => {
   const { compSpec, QUEUE_COMPONENT_SPEC_DIR, QUEUE_COMPONENT_SPEC } = ctx;
 
+  logSecurityEvent(
+    'interactive-wizard-start',
+    'info',
+    'Starting interactive component scanner wizard'
+  );
+
   console.info(chalk.cyanBright("\n✨  Interactive component scanner  ✨\n"));
 
   /* ── 2.1  component name                                            */
-  const compName = await input({
+  const compName = await secureComponentNameInput({
     message: "🔍 Component name to search (e.g. Text):",
-    validate: (v) => (!!v.trim() ? true : "Please type a component name"),
     default: compSpec?.old?.compName || "",
-    transformer: (v) => v.trim(),
   });
 
   /* ── 2.2  target component name                                     */
-  const migrateTo = await input({
+  const migrateTo = await secureComponentNameInput({
     message: `🚚  Migrate ${chalk.yellow(compSpec?.new?.compName || compName)} ➜  (leave empty for same)`,
     default: compSpec?.new?.compName || compName,
-    transformer: (v) => v.trim(),
+    allowEmpty: true,
   });
+
+  const finalMigrateTo = migrateTo || compName;
 
   /* ── 2.3  old import sources (multi-line, finish with empty line)   */
   console.info(
@@ -93,36 +106,35 @@ export const wizard = async (ctx: GlobalState) => {
         "    Hit Enter on an empty line to finish:",
     ),
   );
-  const oldPkgs: string[] = compSpec?.old.oldImportPath || [];
+  
+  const existingPackages = compSpec?.old.oldImportPath ? 
+    compSpec.old.oldImportPath.split(',').map(p => p.trim()).filter(p => p.length > 0) : 
+    [];
+  
+  const oldPkgs = await securePackageCollection("   • ", existingPackages);
 
-  while (true) {
-    if (oldPkgs.length > 0) {
-      console.info(chalk.green("   • Current packages:"));
-      oldPkgs.forEach((pkg) => console.info(`     - ${pkg}`));
-    }
-    const ans = await input({ message: "   • " });
-    if (!ans.trim()) break;
-    oldPkgs.push(ans.trim());
+  if (oldPkgs.length === 0) {
+    console.warn(chalk.yellow("⚠️ No packages specified. Adding a placeholder."));
+    oldPkgs.push("@placeholder/package");
   }
 
   /* ── 2.4  new import source                                         */
-  const newPkg = await input({
-    message: `📦  Set the NEW import for ${chalk.yellow(migrateTo)} :`,
+  const newPkg = await securePackageNameInput({
+    message: `📦  Set the NEW import for ${chalk.yellow(finalMigrateTo)} :`,
     default: compSpec?.new.newImportPath || "",
-    validate: (v) => (!!v.trim() ? true : "Package name required"),
   });
 
   /* ── 2.5  import type (named or default)                            */
-  const importType = await select({
+  const importType = await secureSelect({
     message: "🔗  Import type:",
     default: "named",
     choices: [
       {
-        name: `named   - import { ${migrateTo} } from '${newPkg}'`,
+        name: `named   - import { ${finalMigrateTo} } from '${newPkg}'`,
         value: "named",
       },
       {
-        name: `default - import ${migrateTo} from '${newPkg}'`,
+        name: `default - import ${finalMigrateTo} from '${newPkg}'`,
         value: "default",
       },
     ],
@@ -139,17 +151,51 @@ export const wizard = async (ctx: GlobalState) => {
     new: {
       newImportPath: newPkg,
       importType,
-      compName: migrateTo,
+      compName: finalMigrateTo,
     },
   };
 
-  fs.mkdirSync(QUEUE_COMPONENT_SPEC_DIR, { recursive: true });
+  try {
+    // Validate the payload before writing
+    const sanitizedPayload = {
+      old: {
+        oldImportPath: sanitizers.string(payload.old.oldImportPath),
+        compName: sanitizers.componentName(payload.old.compName),
+      },
+      new: {
+        newImportPath: sanitizers.packageName(payload.new.newImportPath),
+        importType: payload.new.importType,
+        compName: sanitizers.componentName(payload.new.compName),
+      },
+    };
 
-  fs.writeFileSync(
-    QUEUE_COMPONENT_SPEC,
-    JSON.stringify(payload, null, 2),
-    "utf8",
-  );
+    fs.mkdirSync(QUEUE_COMPONENT_SPEC_DIR, { recursive: true });
+
+    fs.writeFileSync(
+      QUEUE_COMPONENT_SPEC,
+      JSON.stringify(sanitizedPayload, null, 2),
+      "utf8",
+    );
+
+    logSecurityEvent(
+      'interactive-wizard-complete',
+      'info',
+      'Component specification saved successfully',
+      { 
+        componentName: sanitizedPayload.old.compName,
+        targetName: sanitizedPayload.new.compName,
+        packageCount: oldPkgs.length
+      }
+    );
+  } catch (error) {
+    logSecurityEvent(
+      'interactive-wizard-error',
+      'error',
+      'Failed to save component specification',
+      { error: error instanceof Error ? error.message : String(error) }
+    );
+    throw error;
+  }
 
   console.info(
     chalk.magentaBright(
@@ -161,7 +207,7 @@ export const wizard = async (ctx: GlobalState) => {
     importType,
     compName,
     oldPkgs,
-    migrateTo,
+    migrateTo: finalMigrateTo,
     newPkg,
   });
 

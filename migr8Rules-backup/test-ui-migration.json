@@ -1,0 +1,88 @@
+{
+  "lookup": {
+    "rootPath": "/data/data/com.termux/files/home/jsx-migr8/test-dry-run",
+    "packages": ["@old-ui/components"],
+    "components": ["Button", "Text", "Card"]
+  },
+  "migr8rules": [
+    {
+      "package": "@old-ui/components",
+      "importType": "named",
+      "component": "Button",
+      "importTo": {
+        "importStm": "@new-ui/components",
+        "importType": "named",
+        "component": "Button"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [{ "variant": "primary" }],
+          "rename": { "variant": "appearance" },
+          "set": { "appearance": "primary" },
+          "remove": []
+        },
+        {
+          "order": 2,
+          "match": [{ "variant": "secondary" }],
+          "rename": { "variant": "appearance" },
+          "set": { "appearance": "secondary" },
+          "remove": []
+        }
+      ]
+    },
+    {
+      "package": "@old-ui/components",
+      "importType": "named",
+      "component": "Text",
+      "importTo": {
+        "importStm": "@new-ui/components",
+        "importType": "named",
+        "component": "Typography"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [{ "size": "large", "weight": "bold" }],
+          "remove": ["size", "weight"],
+          "set": { "variant": "h1" }
+        },
+        {
+          "order": 2,
+          "match": [{ "size": "medium" }],
+          "remove": ["size"],
+          "set": { "variant": "body1" }
+        },
+        {
+          "order": 3,
+          "match": [{ "size": "small" }],
+          "remove": ["size"],
+          "set": { "variant": "caption" }
+        }
+      ]
+    },
+    {
+      "package": "@old-ui/components",
+      "importType": "named",
+      "component": "Card",
+      "importTo": {
+        "importStm": "@new-ui/components",
+        "importType": "named",
+        "component": "Card"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [{ "elevated": true }],
+          "remove": ["elevated"],
+          "set": { "elevation": 3 }
+        },
+        {
+          "order": 2,
+          "match": [{}],
+          "set": { "elevation": 0 }
+        }
+      ]
+    }
+  ]
+}

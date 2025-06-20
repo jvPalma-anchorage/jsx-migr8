@@ -1,0 +1,524 @@
+{
+  "lookup": {
+    "@material-ui/core": {
+      "AppBar": ["@mui/material", "AppBar"],
+      "Toolbar": ["@mui/material", "Toolbar"],
+      "Typography": ["@mui/material", "Typography"],
+      "Button": ["@mui/material", "Button"],
+      "IconButton": ["@mui/material", "IconButton"],
+      "Drawer": ["@mui/material", "Drawer"],
+      "List": ["@mui/material", "List"],
+      "ListItem": ["@mui/material", "ListItem"],
+      "ListItemIcon": ["@mui/material", "ListItemIcon"],
+      "ListItemText": ["@mui/material", "ListItemText"],
+      "ListItemAvatar": ["@mui/material", "ListItemAvatar"],
+      "ListItemSecondaryAction": ["@mui/material", "ListItemSecondaryAction"],
+      "ListSubheader": ["@mui/material", "ListSubheader"],
+      "Card": ["@mui/material", "Card"],
+      "CardContent": ["@mui/material", "CardContent"],
+      "CardActions": ["@mui/material", "CardActions"],
+      "Grid": ["@mui/material", "Grid"],
+      "Paper": ["@mui/material", "Paper"],
+      "TextField": ["@mui/material", "TextField"],
+      "FormControl": ["@mui/material", "FormControl"],
+      "FormLabel": ["@mui/material", "FormLabel"],
+      "FormGroup": ["@mui/material", "FormGroup"],
+      "FormControlLabel": ["@mui/material", "FormControlLabel"],
+      "FormHelperText": ["@mui/material", "FormHelperText"],
+      "InputLabel": ["@mui/material", "InputLabel"],
+      "Input": ["@mui/material", "Input"],
+      "FilledInput": ["@mui/material", "FilledInput"],
+      "OutlinedInput": ["@mui/material", "OutlinedInput"],
+      "InputAdornment": ["@mui/material", "InputAdornment"],
+      "Select": ["@mui/material", "Select"],
+      "MenuItem": ["@mui/material", "MenuItem"],
+      "Checkbox": ["@mui/material", "Checkbox"],
+      "Radio": ["@mui/material", "Radio"],
+      "RadioGroup": ["@mui/material", "RadioGroup"],
+      "Switch": ["@mui/material", "Switch"],
+      "Slider": ["@mui/material", "Slider"],
+      "Chip": ["@mui/material", "Chip"],
+      "Avatar": ["@mui/material", "Avatar"],
+      "Badge": ["@mui/material", "Badge"],
+      "Dialog": ["@mui/material", "Dialog"],
+      "DialogTitle": ["@mui/material", "DialogTitle"],
+      "DialogContent": ["@mui/material", "DialogContent"],
+      "DialogActions": ["@mui/material", "DialogActions"],
+      "Snackbar": ["@mui/material", "Snackbar"],
+      "Tooltip": ["@mui/material", "Tooltip"],
+      "Fab": ["@mui/material", "Fab"],
+      "Table": ["@mui/material", "Table"],
+      "TableBody": ["@mui/material", "TableBody"],
+      "TableCell": ["@mui/material", "TableCell"],
+      "TableContainer": ["@mui/material", "TableContainer"],
+      "TableHead": ["@mui/material", "TableHead"],
+      "TableRow": ["@mui/material", "TableRow"],
+      "Box": ["@mui/material", "Box"],
+      "Container": ["@mui/material", "Container"],
+      "useMediaQuery": ["@mui/material", "useMediaQuery"],
+      "useTheme": ["@mui/material/styles", "useTheme"],
+      "Tabs": ["@mui/material", "Tabs"],
+      "Tab": ["@mui/material", "Tab"],
+      "Breadcrumbs": ["@mui/material", "Breadcrumbs"],
+      "Link": ["@mui/material", "Link"],
+      "Stepper": ["@mui/material", "Stepper"],
+      "Step": ["@mui/material", "Step"],
+      "StepLabel": ["@mui/material", "StepLabel"],
+      "StepContent": ["@mui/material", "StepContent"],
+      "StepButton": ["@mui/material", "StepButton"],
+      "BottomNavigation": ["@mui/material", "BottomNavigation"],
+      "BottomNavigationAction": ["@mui/material", "BottomNavigationAction"],
+      "Menu": ["@mui/material", "Menu"],
+      "Popover": ["@mui/material", "Popover"],
+      "Popper": ["@mui/material", "Popper"],
+      "Backdrop": ["@mui/material", "Backdrop"],
+      "Modal": ["@mui/material", "Modal"],
+      "Fade": ["@mui/material", "Fade"],
+      "Grow": ["@mui/material", "Grow"],
+      "Slide": ["@mui/material", "Slide"],
+      "Zoom": ["@mui/material", "Zoom"],
+      "Collapse": ["@mui/material", "Collapse"],
+      "CircularProgress": ["@mui/material", "CircularProgress"],
+      "LinearProgress": ["@mui/material", "LinearProgress"],
+      "GridList": ["@mui/material", "ImageList"],
+      "GridListTile": ["@mui/material", "ImageListItem"],
+      "GridListTileBar": ["@mui/material", "ImageListItemBar"],
+      "ExpansionPanel": ["@mui/material", "Accordion"],
+      "ExpansionPanelSummary": ["@mui/material", "AccordionSummary"],
+      "ExpansionPanelDetails": ["@mui/material", "AccordionDetails"],
+      "ExpansionPanelActions": ["@mui/material", "AccordionActions"],
+      "Hidden": ["@mui/material", "Box"],
+      "Icon": ["@mui/material", "Icon"],
+      "SvgIcon": ["@mui/material", "SvgIcon"],
+      "useScrollTrigger": ["@mui/material", "useScrollTrigger"],
+      "Divider": ["@mui/material", "Divider"]
+    },
+    "@material-ui/icons": {
+      "*": ["@mui/icons-material", "*"]
+    },
+    "@material-ui/lab": {
+      "TreeView": ["@mui/x-tree-view", "TreeView"],
+      "TreeItem": ["@mui/x-tree-view", "TreeItem"],
+      "Alert": ["@mui/material", "Alert"],
+      "AlertTitle": ["@mui/material", "AlertTitle"],
+      "Skeleton": ["@mui/material", "Skeleton"],
+      "SpeedDial": ["@mui/material", "SpeedDial"],
+      "SpeedDialAction": ["@mui/material", "SpeedDialAction"],
+      "SpeedDialIcon": ["@mui/material", "SpeedDialIcon"],
+      "Autocomplete": ["@mui/material", "Autocomplete"],
+      "ToggleButton": ["@mui/material", "ToggleButton"],
+      "ToggleButtonGroup": ["@mui/material", "ToggleButtonGroup"],
+      "Rating": ["@mui/material", "Rating"],
+      "Pagination": ["@mui/material", "Pagination"],
+      "Timeline": ["@mui/lab", "Timeline"],
+      "TimelineItem": ["@mui/lab", "TimelineItem"],
+      "TimelineSeparator": ["@mui/lab", "TimelineSeparator"],
+      "TimelineConnector": ["@mui/lab", "TimelineConnector"],
+      "TimelineContent": ["@mui/lab", "TimelineContent"],
+      "TimelineDot": ["@mui/lab", "TimelineDot"],
+      "TimelineOppositeContent": ["@mui/lab", "TimelineOppositeContent"]
+    },
+    "@material-ui/pickers": {
+      "DatePicker": ["@mui/x-date-pickers", "DatePicker"],
+      "TimePicker": ["@mui/x-date-pickers", "TimePicker"],
+      "DateTimePicker": ["@mui/x-date-pickers", "DateTimePicker"],
+      "KeyboardDatePicker": ["@mui/x-date-pickers", "DatePicker"],
+      "KeyboardTimePicker": ["@mui/x-date-pickers", "TimePicker"]
+    },
+    "@material-ui/core/styles": {
+      "makeStyles": ["@mui/styles", "makeStyles"],
+      "createStyles": ["@mui/styles", "createStyles"],
+      "withStyles": ["@mui/styles", "withStyles"],
+      "styled": ["@mui/material/styles", "styled"],
+      "Theme": ["@mui/material/styles", "Theme"],
+      "useTheme": ["@mui/material/styles", "useTheme"],
+      "ThemeProvider": ["@mui/material/styles", "ThemeProvider"],
+      "createTheme": ["@mui/material/styles", "createTheme"],
+      "createMuiTheme": ["@mui/material/styles", "createTheme"],
+      "MuiThemeProvider": ["@mui/material/styles", "ThemeProvider"]
+    },
+    "@material-ui/core/styles/colorManipulator": {
+      "fade": ["@mui/material/styles", "alpha"],
+      "darken": ["@mui/material/styles", "darken"],
+      "lighten": ["@mui/material/styles", "lighten"],
+      "emphasize": ["@mui/material/styles", "emphasize"],
+      "deemphasize": ["@mui/material/styles", "deemphasize"]
+    },
+    "@material-ui/system": {
+      "spacing": ["@mui/system", "spacing"],
+      "palette": ["@mui/system", "palette"],
+      "typography": ["@mui/system", "typography"]
+    }
+  },
+  "rules": [
+    {
+      "component": "Button",
+      "match": [{ "color": "default" }],
+      "remove": ["color"],
+      "set": {
+        "color": "inherit"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Chip",
+      "match": [{ "variant": "default" }],
+      "remove": ["variant"],
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Avatar",
+      "match": [{ "variant": "circle" }],
+      "remove": ["variant"],
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Avatar",
+      "match": [{ "variant": "rounded" }],
+      "remove": ["variant"],
+      "set": {
+        "variant": "rounded"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Avatar",
+      "match": [{ "variant": "square" }],
+      "remove": ["variant"],
+      "set": {
+        "variant": "square"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Badge",
+      "match": [{ "overlap": "circle" }],
+      "rename": {
+        "overlap": "overlap"
+      },
+      "set": {
+        "overlap": "circular"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Badge",
+      "match": [{ "overlap": "rectangle" }],
+      "rename": {
+        "overlap": "overlap"
+      },
+      "set": {
+        "overlap": "rectangular"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "TextField",
+      "match": [{ "rowsMax": "*" }],
+      "rename": {
+        "rowsMax": "maxRows"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "ExpansionPanel",
+      "match": [],
+      "rename": {
+        "ExpansionPanel": "Accordion"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "ExpansionPanelSummary",
+      "match": [],
+      "rename": {
+        "ExpansionPanelSummary": "AccordionSummary"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "ExpansionPanelDetails",
+      "match": [],
+      "rename": {
+        "ExpansionPanelDetails": "AccordionDetails"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "ExpansionPanelActions",
+      "match": [],
+      "rename": {
+        "ExpansionPanelActions": "AccordionActions"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "GridList",
+      "match": [],
+      "rename": {
+        "GridList": "ImageList"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "GridListTile",
+      "match": [],
+      "rename": {
+        "GridListTile": "ImageListItem"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "GridListTileBar",
+      "match": [],
+      "rename": {
+        "GridListTileBar": "ImageListItemBar"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Hidden",
+      "match": [],
+      "remove": ["smDown", "mdUp", "lgUp", "xlUp", "smUp", "mdDown", "lgDown", "xlDown"],
+      "replaceWith": {
+        "code": "<Box sx={{ display: { xs: 'none', sm: 'block' } }}>{CHILDREN}</Box>",
+        "INNER_PROPS": [],
+        "OUTER_PROPS": []
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Skeleton",
+      "match": [{ "variant": "rect" }],
+      "rename": {
+        "variant": "variant"
+      },
+      "set": {
+        "variant": "rectangular"
+      },
+      "importFrom": "@material-ui/lab",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Skeleton",
+      "match": [{ "variant": "circle" }],
+      "rename": {
+        "variant": "variant"
+      },
+      "set": {
+        "variant": "circular"
+      },
+      "importFrom": "@material-ui/lab",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Menu",
+      "match": [],
+      "remove": ["getContentAnchorEl", "anchorOrigin", "transformOrigin"],
+      "set": {
+        "anchorOrigin": "{ vertical: 'bottom', horizontal: 'left' }",
+        "transformOrigin": "{ vertical: 'top', horizontal: 'left' }"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Tabs",
+      "match": [{ "scrollButtons": "auto" }],
+      "rename": {
+        "scrollButtons": "scrollButtons"
+      },
+      "set": {
+        "scrollButtons": "auto"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Tabs",
+      "match": [{ "scrollButtons": "desktop" }],
+      "rename": {
+        "scrollButtons": "scrollButtons"
+      },
+      "set": {
+        "scrollButtons": "auto"
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Tabs",
+      "match": [{ "scrollButtons": "on" }],
+      "rename": {
+        "scrollButtons": "scrollButtons"
+      },
+      "set": {
+        "scrollButtons": true
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "Tabs",
+      "match": [{ "scrollButtons": "off" }],
+      "rename": {
+        "scrollButtons": "scrollButtons"
+      },
+      "set": {
+        "scrollButtons": false
+      },
+      "importFrom": "@material-ui/core",
+      "importTo": "@mui/material"
+    },
+    {
+      "component": "DatePicker",
+      "match": [],
+      "remove": ["renderInput"],
+      "replaceWith": {
+        "code": "<DatePicker {...OUTER_PROPS} slots={{ textField: TextField }} />",
+        "INNER_PROPS": [],
+        "OUTER_PROPS": ["label", "value", "onChange"]
+      },
+      "importFrom": "@material-ui/pickers",
+      "importTo": "@mui/x-date-pickers"
+    },
+    {
+      "component": "TimePicker",
+      "match": [],
+      "remove": ["renderInput"],
+      "replaceWith": {
+        "code": "<TimePicker {...OUTER_PROPS} slots={{ textField: TextField }} />",
+        "INNER_PROPS": [],
+        "OUTER_PROPS": ["label", "value", "onChange"]
+      },
+      "importFrom": "@material-ui/pickers",
+      "importTo": "@mui/x-date-pickers"
+    },
+    {
+      "component": "DateTimePicker",
+      "match": [],
+      "remove": ["renderInput"],
+      "replaceWith": {
+        "code": "<DateTimePicker {...OUTER_PROPS} slots={{ textField: TextField }} />",
+        "INNER_PROPS": [],
+        "OUTER_PROPS": ["label", "value", "onChange"]
+      },
+      "importFrom": "@material-ui/pickers",
+      "importTo": "@mui/x-date-pickers"
+    },
+    {
+      "component": "KeyboardDatePicker",
+      "match": [],
+      "rename": {
+        "KeyboardDatePicker": "DatePicker"
+      },
+      "remove": ["renderInput", "KeyboardButtonProps", "disableToolbar"],
+      "replaceWith": {
+        "code": "<DatePicker {...OUTER_PROPS} slots={{ textField: TextField }} />",
+        "INNER_PROPS": [],
+        "OUTER_PROPS": ["label", "value", "onChange", "format", "margin"]
+      },
+      "importFrom": "@material-ui/pickers",
+      "importTo": "@mui/x-date-pickers"
+    },
+    {
+      "component": "KeyboardTimePicker",
+      "match": [],
+      "rename": {
+        "KeyboardTimePicker": "TimePicker"
+      },
+      "remove": ["renderInput", "KeyboardButtonProps"],
+      "replaceWith": {
+        "code": "<TimePicker {...OUTER_PROPS} slots={{ textField: TextField }} />",
+        "INNER_PROPS": [],
+        "OUTER_PROPS": ["label", "value", "onChange", "margin"]
+      },
+      "importFrom": "@material-ui/pickers",
+      "importTo": "@mui/x-date-pickers"
+    },
+    {
+      "function": "fade",
+      "match": [],
+      "rename": {
+        "fade": "alpha"
+      },
+      "importFrom": "@material-ui/core/styles/colorManipulator",
+      "importTo": "@mui/material/styles"
+    },
+    {
+      "function": "createMuiTheme",
+      "match": [],
+      "rename": {
+        "createMuiTheme": "createTheme"
+      },
+      "importFrom": "@material-ui/core/styles",
+      "importTo": "@mui/material/styles"
+    },
+    {
+      "function": "MuiThemeProvider",
+      "match": [],
+      "rename": {
+        "MuiThemeProvider": "ThemeProvider"
+      },
+      "importFrom": "@material-ui/core/styles",
+      "importTo": "@mui/material/styles"
+    },
+    {
+      "function": "makeStyles",
+      "match": [],
+      "replaceWith": {
+        "code": "// MIGRATION WARNING: makeStyles is deprecated in MUI v5\n// Consider migrating to:\n// 1. emotion/styled API: const StyledComponent = styled('div')((theme) => ({ ... }))\n// 2. sx prop: <Component sx={{ ... }} />\n// 3. theme.unstable_sx utility for dynamic styles\n\n// Temporary compatibility - install @mui/styles for makeStyles support\nconst useStyles = makeStyles((theme) => ({...STYLES}))",
+        "note": "makeStyles is deprecated in MUI v5. This is a compatibility shim - consider migrating to emotion/styled or sx prop."
+      },
+      "importFrom": "@material-ui/core/styles",
+      "importTo": "@mui/styles"
+    },
+    {
+      "function": "withStyles",
+      "match": [],
+      "replaceWith": {
+        "code": "// MIGRATION WARNING: withStyles is deprecated in MUI v5\n// Consider migrating to:\n// 1. emotion/styled API: const StyledComponent = styled(BaseComponent)((theme) => ({ ... }))\n// 2. sx prop for simple styling\n\n// Temporary compatibility - install @mui/styles for withStyles support\nconst StyledComponent = withStyles((theme) => ({...STYLES}))(BaseComponent)",
+        "note": "withStyles is deprecated in MUI v5. This is a compatibility shim - consider migrating to emotion/styled API."
+      },
+      "importFrom": "@material-ui/core/styles",
+      "importTo": "@mui/styles"
+    },
+    {
+      "themeProperty": "overrides",
+      "match": [],
+      "rename": {
+        "overrides": "components"
+      },
+      "note": "Theme overrides property renamed to components in v5"
+    },
+    {
+      "themeProperty": "props",
+      "match": [],
+      "rename": {
+        "props": "defaultProps"
+      },
+      "note": "Theme props property renamed to defaultProps in v5"
+    },
+    {
+      "themeProperty": "spacing",
+      "match": [],
+      "note": "Spacing function signature changed in v5 - now accepts multiple arguments"
+    }
+  ]
+}

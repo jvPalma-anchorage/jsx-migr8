@@ -1,41 +1,63 @@
-import { describe, it, expect, jest, beforeEach } from "@jest/globals";
-import fg from "fast-glob";
-import { buildProjectGraph } from "../buildGraph";
-import { getContext } from "../../context/globalContext";
-import * as fsUtils from "../../utils/fs-utils";
-import * as fileAnalyzer from "../../analyzer/fileAnalyzer";
-import { logger } from "../../utils/logger";
-import type { ProjectGraph } from "../types";
+import { jest } from '@jest/globals';
+import { 
+  buildGraph, 
+  buildGraphAsync, 
+  buildGraphAsyncBatched,
+  buildGraphAsyncEnhanced 
+} from '../buildGraph';
+import * as fsUtils from '@/utils/fs-utils';
+import * as performanceMonitor from '@/utils/fs/performance-monitor';
+import * as progressIndicator from '@/utils/fs/progress-indicator';
+import * as workerPool from '@/utils/fs/worker-pool';
+import * as pathUtils from '@/utils/pathUtils';
+import * as astTypes from '@/types/ast';
+import { builders as b, visit } from 'ast-types';
+import fg from 'fast-glob';
+import { types as T } from 'recast';
 
 // Mock dependencies
-jest.mock("fast-glob");
-jest.mock("../../context/globalContext");
-jest.mock("../../utils/fs-utils");
-jest.mock("../../analyzer/fileAnalyzer");
-jest.mock("../../utils/logger");
+jest.mock('fast-glob');
+jest.mock('@/utils/fs-utils');
+jest.mock('@/utils/fs/performance-monitor');
+jest.mock('@/utils/fs/progress-indicator');
+jest.mock('@/utils/fs/worker-pool');
+jest.mock('@/utils/pathUtils');
+jest.mock('@/types/ast');
+jest.mock('ast-types', () => ({
+  builders: {
+    booleanLiteral: jest.fn((value) => ({ type: 'BooleanLiteral', value }))
+  },
+  visit: jest.fn()
+}));
 
-const mockFg = fg as jest.MockedFunction<typeof fg>;
-const mockGetContext = getContext as jest.MockedFunction<typeof getContext>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
-
-describe("buildGraph", () => {
-  let mockContext: any;
+describe('buildGraph', () => {
+  let mockFiles: string[];
+  let mockAst: any;
+  let mockCode: string;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockContext = {
-      BLACK_LIST: ["node_modules", "dist"],
-      ROOT_DIR: "/project",
-      PACKAGES: ["@company/ui-lib", "@company/common"],
-      TARGET_COMPONENT: "Button",
-      report: {
-        "@company/ui-lib": {},
-        "@company/common": {},
-      },
+    mockFiles = [
+      '/project/src/component1.tsx',
+      '/project/src/component2.tsx',
+      '/project/src/utils/helper.ts'
+    ];
+
+    mockAst = {
+      type: 'Program',
+      body: []
     };
 
-    mockGetContext.mockReturnValue(mockContext);
+    mockCode = 'const Component = () => <div>Hello</div>';
+
+    // Setup default mocks
+    (fg.sync as jest.Mock).mockReturnValue(mockFiles);
+    (fsUtils.getFileAstAndCode as jest.Mock).mockReturnValue([mockAst, mockCode]);
+    (pathUtils.getCompName as jest.Mock).mockImplementation((local, imported) => imported || local);
+    (astTypes.getNameFromSpecifier as jest.Mock).mockImplementation((spec) => spec.imported?.name || 'default');
+    (astTypes.getSpecifierLocalName as jest.Mock).mockImplementation((spec) => spec.local?.name || 'default');
+    (astTypes.isIdentifier as jest.Mock).mockReturnValue(true);
   });
 
   describe("buildProjectGraph", () => {

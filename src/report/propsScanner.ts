@@ -100,7 +100,6 @@ export const propsScanner = async (summary: ComponentPropsSummary) => {
     if (next === "genRules") {
       // returns to main menu
       messageState.value = await genMigr8Rule(summary, selections);
-      console.log(1111, message);
       break;
     }
     if (next === "menu") break; // returns to main menu
@@ -114,6 +113,5 @@ export const propsScanner = async (summary: ComponentPropsSummary) => {
     }
   }
 
-  console.log("return", messageState.value);
   return messageState.value;
 };

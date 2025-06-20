@@ -1,0 +1,80 @@
+{
+  "lookup": {
+    "rootPath": "/data/data/com.termux/files/home/jsx-migr8/test-react-project",
+    "packages": ["@mui/material"],
+    "components": ["Button", "TextField", "Card"]
+  },
+  "migr8rules": [
+    {
+      "package": "@mui/material",
+      "importType": "named",
+      "component": "Button",
+      "importTo": {
+        "importStm": "@chakra-ui/react",
+        "importType": "named",
+        "component": "Button"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [{ "variant": "contained", "color": "primary" }],
+          "remove": ["variant", "color"],
+          "set": { "colorScheme": "blue", "variant": "solid" }
+        },
+        {
+          "order": 2,
+          "match": [{ "variant": "outlined" }],
+          "remove": ["variant"],
+          "set": { "variant": "outline" }
+        },
+        {
+          "order": 3,
+          "match": [{ "size": "large" }],
+          "rename": { "size": "size" },
+          "set": { "size": "lg" }
+        }
+      ]
+    },
+    {
+      "package": "@mui/material",
+      "importType": "named",
+      "component": "TextField",
+      "importTo": {
+        "importStm": "@chakra-ui/react",
+        "importType": "named",
+        "component": "Input"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [{ "variant": "outlined" }],
+          "remove": ["variant", "label"],
+          "set": { "placeholder": "{LABEL_VALUE}" }
+        },
+        {
+          "order": 2,
+          "match": [{ "fullWidth": true }],
+          "remove": ["fullWidth"],
+          "set": { "width": "100%" }
+        }
+      ]
+    },
+    {
+      "package": "@mui/material",
+      "importType": "named",
+      "component": "Card",
+      "importTo": {
+        "importStm": "@chakra-ui/react",
+        "importType": "named",
+        "component": "Box"
+      },
+      "rules": [
+        {
+          "order": 1,
+          "match": [{}],
+          "set": { "borderWidth": "1px", "borderRadius": "lg", "overflow": "hidden", "p": 6 }
+        }
+      ]
+    }
+  ]
+}

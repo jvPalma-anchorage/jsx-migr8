@@ -4,51 +4,37 @@
  */
 
 // AST and code parsing
-export {
-  getAstFromCode,
-  getFileAstAndCodeAsync,
-  getFileAstAndCode,
-} from "./fs/ast-operations";
+export * from "./fs/ast-operations";
 
 // JSON operations
-export {
-  getJsonFile,
-  getJsonFileAsync,
-  writeJsonFileAsync,
-} from "./fs/json-operations";
+export * from "./fs/json-operations";
 
 // Migration-specific utilities
-export {
-  getMigr8RulesFileNames,
-  getMigr8RulesFileNamesAsync,
-} from "./fs/migration-utils";
+export  *  from "./fs/migration-utils";
 
 // Error handling
-export {
-  FileOperationError,
-  RetryConfig,
-  DEFAULT_RETRY_CONFIG,
-  sleep,
-  isRetryableError,
-} from "./fs/error-handling";
+export * from "./fs/error-handling";
+
+// Error recovery and retry
+export  * from "./fs/error-recovery";
 
 // Concurrency utilities
-export {
-  Semaphore,
-  AsyncBatchProcessor,
-  getConcurrencyLimit,
-} from "./fs/concurrency-utils";
+export * from "./fs/concurrency-utils";
 
 // Async file operations
-export {
-  readFileAsync,
-  writeFileAsync,
-  fileExistsAsync,
-  getFileStatsAsync,
-} from "./fs/async-file-operations";
+export * from "./fs/async-file-operations";
 
 // AsyncFileUtils class
-export { AsyncFileUtils } from "./fs/async-file-utils";
+export * from "./fs/async-file-utils";
 
-// Re-export types for backward compatibility
-export type { RetryConfig as RetryConfiguration } from "./fs/error-handling";
+// Performance monitoring
+export * from "./fs/performance-monitor";
+
+// Progress indicators
+export * from "./fs/progress-indicator";
+
+// Worker pool
+export * from "./fs/worker-pool";
+
+// Memory monitoring
+export * from "./fs/memory-monitor";

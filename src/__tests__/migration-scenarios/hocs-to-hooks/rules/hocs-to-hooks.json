@@ -1,0 +1,130 @@
+{
+  "name": "HOCs to Custom Hooks",
+  "description": "Converts Higher-Order Components to custom hooks",
+  "lookup": {
+    "react": ["ComponentType", "Component"]
+  },
+  "transformations": [
+    {
+      "type": "hoc_to_hook",
+      "pattern": "function with{HocName}<P extends object>(WrappedComponent: ComponentType<P & {PropsInterface}>)",
+      "replacement": "const use{HocName} = (): {ReturnInterface} => {",
+      "steps": [
+        {
+          "action": "extract_hoc_logic",
+          "description": "Extract the logic from HOC class component to hook"
+        },
+        {
+          "action": "convert_lifecycle_to_effects",
+          "description": "Convert componentDidMount, componentDidUpdate to useEffect"
+        },
+        {
+          "action": "convert_state_to_hooks",
+          "description": "Convert this.state to useState hooks"
+        },
+        {
+          "action": "convert_methods_to_callbacks",
+          "description": "Convert class methods to useCallback hooks"
+        },
+        {
+          "action": "return_hook_api",
+          "description": "Return hook values instead of rendering component"
+        }
+      ]
+    },
+    {
+      "type": "component_composition",
+      "pattern": "return <WrappedComponent {...props} {injectedProps} />",
+      "replacement": "return { {hookValues} }",
+      "description": "Convert component composition to hook return"
+    },
+    {
+      "type": "conditional_rendering_to_guard",
+      "pattern": "if (!{condition}) { return <{FallbackComponent} />; }",
+      "replacement": "const {GuardName} = ({ children }) => { if (!{condition}) return <{FallbackComponent} />; return <>{children}</>; }",
+      "description": "Convert conditional rendering to guard components"
+    }
+  ],
+  "hookConversions": [
+    {
+      "hocPattern": "withAuth",
+      "hookName": "useAuth",
+      "returnInterface": "UseAuthReturn",
+      "guardComponent": "PermissionGuard",
+      "additionalHooks": ["usePermissionGuard"]
+    },
+    {
+      "hocPattern": "withData",
+      "hookName": "useData",
+      "returnInterface": "UseDataReturn<T>",
+      "genericSupport": true,
+      "configParameter": true
+    },
+    {
+      "hocPattern": "withTheme",
+      "hookName": "useTheme", 
+      "returnInterface": "UseThemeReturn",
+      "localStorage": true
+    }
+  ],
+  "stateTransformations": [
+    {
+      "pattern": "this.state = { {stateObject} }",
+      "replacement": "const [state, setState] = useState({ {stateObject} })"
+    },
+    {
+      "pattern": "this.setState({ {updates} })",
+      "replacement": "setState(prev => ({ ...prev, {updates} }))"
+    }
+  ],
+  "lifecycleTransformations": [
+    {
+      "pattern": "componentDidMount() { {body} }",
+      "replacement": "useEffect(() => { {body} }, [])"
+    },
+    {
+      "pattern": "componentDidUpdate(prevProps) { {body} }",
+      "replacement": "useEffect(() => { {body} })"
+    },
+    {
+      "pattern": "componentWillUnmount() { {body} }",
+      "replacement": "useEffect(() => { return () => { {body} }; }, [])"
+    }
+  ],
+  "methodTransformations": [
+    {
+      "pattern": "{methodName} = ({params}) => { {body} }",
+      "replacement": "const {methodName} = useCallback(({params}) => { {body} }, [dependencies])"
+    }
+  ],
+  "usageTransformations": [
+    {
+      "pattern": "const Enhanced{Component} = with{Hoc}({WrappedComponent})",
+      "replacement": "// Use hooks directly in {WrappedComponent}"
+    },
+    {
+      "pattern": "with{Hoc}(with{OtherHoc}({Component}))",
+      "replacement": "// Use multiple hooks in {Component}: use{Hoc}(), use{OtherHoc}()"
+    }
+  ],
+  "importTransformations": [
+    {
+      "pattern": "import { with{HocName} } from",
+      "replacement": "import { use{HocName} } from"
+    }
+  ],
+  "customTransformations": [
+    {
+      "pattern": "connect(mapStateToProps, mapDispatchToProps)",
+      "replacement": {
+        "hooks": ["useSelector", "useDispatch"],
+        "description": "Replace Redux connect with hooks"
+      }
+    },
+    {
+      "pattern": "render() { return ( {jsx} ); }",
+      "replacement": "return { {hookValues} };",
+      "description": "Convert render method to hook return"
+    }
+  ]
+}

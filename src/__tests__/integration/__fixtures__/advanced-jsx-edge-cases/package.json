@@ -1,0 +1,19 @@
+{
+  "name": "advanced-jsx-edge-cases",
+  "version": "1.0.0",
+  "description": "Advanced JSX scenarios and edge cases for migration testing",
+  "main": "src/index.tsx",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  }
+}

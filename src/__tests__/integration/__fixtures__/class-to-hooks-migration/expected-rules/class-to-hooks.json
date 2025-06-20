@@ -1,0 +1,196 @@
+{
+  "lookup": {
+    "react": {
+      "Component": ["react", "useState, useEffect, useCallback, useMemo"],
+      "PureComponent": ["react", "useState, useEffect, useCallback, useMemo, memo"],
+      "createRef": ["react", "useRef"]
+    }
+  },
+  "rules": [
+    {
+      "pattern": "class.*extends Component",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName: React.FC<Props> = (props) => {\n  // Convert state to useState hooks\n  // Convert lifecycle methods to useEffect hooks\n  // Convert methods to useCallback hooks\n  // Convert refs to useRef hooks\n  \n  return (\n    // JSX content\n  );\n};",
+        "note": "Class components should be converted to functional components with hooks"
+      }
+    },
+    {
+      "pattern": "class.*extends PureComponent",
+      "match": [],
+      "replaceWith": {
+        "code": "const ComponentName: React.FC<Props> = React.memo((props) => {\n  // Convert state to useState hooks\n  // Convert lifecycle methods to useEffect hooks\n  // Convert methods to useCallback hooks\n  // Convert refs to useRef hooks\n  \n  return (\n    // JSX content\n  );\n});",
+        "note": "PureComponent should be converted to functional component wrapped with React.memo"
+      }
+    },
+    {
+      "lifecycle": "componentDidMount",
+      "match": [],
+      "replaceWith": {
+        "code": "useEffect(() => {\n  // componentDidMount logic here\n}, []);",
+        "note": "componentDidMount becomes useEffect with empty dependency array"
+      }
+    },
+    {
+      "lifecycle": "componentDidUpdate",
+      "match": [],
+      "replaceWith": {
+        "code": "useEffect(() => {\n  // componentDidUpdate logic here\n}, [/* dependencies */]);",
+        "note": "componentDidUpdate becomes useEffect with specific dependencies"
+      }
+    },
+    {
+      "lifecycle": "componentWillUnmount",
+      "match": [],
+      "replaceWith": {
+        "code": "useEffect(() => {\n  return () => {\n    // componentWillUnmount cleanup logic here\n  };\n}, []);",
+        "note": "componentWillUnmount becomes useEffect cleanup function"
+      }
+    },
+    {
+      "lifecycle": "getDerivedStateFromProps",
+      "match": [],
+      "replaceWith": {
+        "code": "// Replace getDerivedStateFromProps with useEffect that updates state based on props\nuseEffect(() => {\n  // Update state based on props changes\n}, [/* prop dependencies */]);",
+        "note": "getDerivedStateFromProps should be replaced with useEffect that watches prop changes"
+      }
+    },
+    {
+      "state": "this.state",
+      "match": [],
+      "replaceWith": {
+        "code": "// Replace this.state with useState hooks\nconst [stateName, setStateName] = useState(initialValue);",
+        "note": "this.state should be converted to useState hooks"
+      }
+    },
+    {
+      "state": "this.setState",
+      "match": [],
+      "replaceWith": {
+        "code": "// Replace this.setState with state setter from useState\nsetStateName(newValue);\n// or for functional updates:\nsetStateName(prevState => ({ ...prevState, ...updates }));",
+        "note": "this.setState should be replaced with useState setter functions"
+      }
+    },
+    {
+      "ref": "createRef",
+      "match": [],
+      "replaceWith": {
+        "code": "const refName = useRef<HTMLElement>(null);",
+        "note": "createRef should be replaced with useRef hook"
+      }
+    },
+    {
+      "ref": "this.refName.current",
+      "match": [],
+      "replaceWith": {
+        "code": "refName.current",
+        "note": "Ref access remains the same but without 'this.'"
+      }
+    },
+    {
+      "method": "class method",
+      "match": [],
+      "replaceWith": {
+        "code": "const methodName = useCallback(() => {\n  // method logic here\n}, [/* dependencies */]);",
+        "note": "Class methods should be converted to useCallback hooks for performance optimization"
+      }
+    },
+    {
+      "context": "static contextType",
+      "match": [],
+      "replaceWith": {
+        "code": "const contextValue = useContext(ContextName);",
+        "note": "static contextType should be replaced with useContext hook"
+      }
+    },
+    {
+      "context": "this.context",
+      "match": [],
+      "replaceWith": {
+        "code": "contextValue",
+        "note": "this.context should be replaced with the value from useContext"
+      }
+    },
+    {
+      "errorBoundary": "componentDidCatch",
+      "match": [],
+      "replaceWith": {
+        "code": "// Error boundaries cannot be converted to hooks.\n// Keep as class component or use a library like react-error-boundary",
+        "note": "Error boundaries must remain as class components or use third-party solutions"
+      }
+    },
+    {
+      "errorBoundary": "getDerivedStateFromError",
+      "match": [],
+      "replaceWith": {
+        "code": "// Error boundaries cannot be converted to hooks.\n// Keep as class component or use a library like react-error-boundary",
+        "note": "Error boundaries must remain as class components or use third-party solutions"
+      }
+    }
+  ],
+  "conversionPatterns": {
+    "stateConversion": {
+      "from": "state = { count: 0, name: '' };",
+      "to": "const [count, setCount] = useState(0);\nconst [name, setName] = useState('');",
+      "note": "Each state property becomes a separate useState hook"
+    },
+    "lifecycleConversion": {
+      "componentDidMount": {
+        "from": "componentDidMount() { /* logic */ }",
+        "to": "useEffect(() => { /* logic */ }, []);"
+      },
+      "componentDidUpdate": {
+        "from": "componentDidUpdate(prevProps, prevState) { /* logic */ }",
+        "to": "useEffect(() => { /* logic */ }, [/* dependencies */]);"
+      },
+      "componentWillUnmount": {
+        "from": "componentWillUnmount() { /* cleanup */ }",
+        "to": "useEffect(() => { return () => { /* cleanup */ }; }, []);"
+      }
+    },
+    "methodConversion": {
+      "from": "handleClick = () => { /* logic */ }",
+      "to": "const handleClick = useCallback(() => { /* logic */ }, [/* dependencies */]);"
+    },
+    "refConversion": {
+      "from": "private inputRef = createRef<HTMLInputElement>();",
+      "to": "const inputRef = useRef<HTMLInputElement>(null);"
+    }
+  },
+  "dependencies": {
+    "required": [
+      "useState",
+      "useEffect", 
+      "useCallback",
+      "useMemo",
+      "useRef",
+      "useContext"
+    ],
+    "optional": [
+      "memo",
+      "forwardRef",
+      "useImperativeHandle",
+      "useLayoutEffect"
+    ]
+  },
+  "migrationSteps": [
+    "1. Identify component type (Component, PureComponent, or error boundary)",
+    "2. Convert class to functional component",
+    "3. Replace state with useState hooks",
+    "4. Convert lifecycle methods to useEffect hooks", 
+    "5. Convert class methods to useCallback hooks",
+    "6. Replace createRef with useRef",
+    "7. Replace context consumption with useContext",
+    "8. Wrap with React.memo if originally PureComponent",
+    "9. Test component behavior and fix any issues",
+    "10. Remove unused imports and clean up code"
+  ],
+  "commonPitfalls": [
+    "Missing dependencies in useEffect arrays",
+    "Infinite re-renders due to missing useCallback/useMemo",
+    "Incorrect state updates (object vs primitive state)",
+    "Lost optimization benefits without React.memo for PureComponent",
+    "Error boundaries cannot be converted to hooks",
+    "Ref callback functions need special handling"
+  ]
+}

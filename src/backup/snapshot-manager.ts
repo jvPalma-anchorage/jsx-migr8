@@ -27,16 +27,11 @@ import {
  */
 export class SnapshotManager {
   private fileUtils: AsyncFileUtils;
-  private batchProcessor: AsyncBatchProcessor<string, BackedUpFile>;
-
   constructor(
     private backupRoot: string,
     private config: BackupConfig,
   ) {
     this.fileUtils = new AsyncFileUtils(config.concurrency);
-    this.batchProcessor = new AsyncBatchProcessor<string, BackedUpFile>(
-      config.concurrency,
-    );
   }
 
   /**
@@ -59,12 +54,14 @@ export class SnapshotManager {
   ): Promise<BackedUpFile[]> {
     const projectRoot = process.cwd();
 
-    return this.batchProcessor.process(
+    const batchProcessor = new AsyncBatchProcessor<string, BackedUpFile>(
       filePaths,
       async (filePath: string) =>
         this.backupSingleFile(backupId, filePath, projectRoot),
-      onProgress,
+      this.config.concurrency,
     );
+
+    return batchProcessor.process(onProgress);
   }
 
   /**

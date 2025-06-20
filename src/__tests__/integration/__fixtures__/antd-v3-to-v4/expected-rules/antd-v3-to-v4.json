@@ -1,0 +1,174 @@
+{
+  "lookup": {
+    "antd": {
+      "Icon": [null, null],
+      "LocaleProvider": ["antd", "ConfigProvider"],
+      "Mention": [null, null]
+    }
+  },
+  "rules": [
+    {
+      "component": "Icon",
+      "match": [],
+      "replaceWith": {
+        "code": "<{ICON_COMPONENT} {...OUTER_PROPS} />",
+        "ICON_COMPONENT": "{{ICON_NAME}}",
+        "INNER_PROPS": [],
+        "OUTER_PROPS": ["style", "className", "onClick", "spin", "rotate", "twoToneColor"]
+      },
+      "importFrom": "antd",
+      "importTo": "@ant-design/icons",
+      "note": "Icons are now separate components from @ant-design/icons package"
+    },
+    {
+      "component": "Form",
+      "match": [],
+      "remove": ["form"],
+      "replaceWith": {
+        "code": "// Form.create() is deprecated. Use Form hooks API instead.\n<Form {...OUTER_PROPS} onFinish={handleFinish} onFinishFailed={handleFinishFailed}>\n  {CHILDREN}\n</Form>",
+        "note": "Form.create() HOC is deprecated. Use Form.useForm() hook instead."
+      },
+      "importFrom": "antd",
+      "importTo": "antd"
+    },
+    {
+      "component": "Form.Item",
+      "match": [],
+      "remove": ["getFieldDecorator"],
+      "rename": {
+        "validateStatus": "validateStatus",
+        "help": "help"
+      },
+      "set": {
+        "name": "fieldName",
+        "rules": "validationRules"
+      },
+      "replaceWith": {
+        "code": "<Form.Item name=\"{FIELD_NAME}\" label=\"{LABEL}\" rules={validationRules} {...OUTER_PROPS}>\n  <Input {...INNER_PROPS} />\n</Form.Item>",
+        "note": "getFieldDecorator is deprecated. Use name prop and children directly."
+      },
+      "importFrom": "antd",
+      "importTo": "antd"
+    },
+    {
+      "component": "LocaleProvider",
+      "match": [],
+      "rename": {
+        "LocaleProvider": "ConfigProvider"
+      },
+      "set": {
+        "locale": "locale"
+      },
+      "importFrom": "antd",
+      "importTo": "antd"
+    },
+    {
+      "component": "Mention",
+      "match": [],
+      "replaceWith": {
+        "code": "// Mention component is deprecated. Use @mentions/mentions or implement custom solution.\n// Consider using AutoComplete with custom filtering.",
+        "note": "Mention component is removed in v4. Use AutoComplete or third-party alternatives."
+      },
+      "importFrom": "antd",
+      "importTo": null
+    },
+    {
+      "component": "Button",
+      "match": [{ "type": "danger" }],
+      "remove": ["type"],
+      "set": {
+        "danger": true
+      },
+      "importFrom": "antd",
+      "importTo": "antd"
+    },
+    {
+      "component": "Table",
+      "match": [],
+      "rename": {
+        "onRowClick": "onRow"
+      },
+      "replaceWith": {
+        "code": "<Table {...OUTER_PROPS} onRow={(record, index) => ({ onClick: () => handleRowClick(record, index) })} />",
+        "note": "onRowClick is deprecated. Use onRow prop instead."
+      },
+      "importFrom": "antd",
+      "importTo": "antd"
+    },
+    {
+      "component": "DatePicker",
+      "match": [],
+      "remove": ["moment"],
+      "set": {
+        "picker": "date"
+      },
+      "note": "Moment.js is replaced with dayjs. Update date handling accordingly.",
+      "importFrom": "antd",
+      "importTo": "antd"
+    },
+    {
+      "component": "TimePicker",
+      "match": [],
+      "remove": ["moment"],
+      "note": "Moment.js is replaced with dayjs. Update time handling accordingly.",
+      "importFrom": "antd",
+      "importTo": "antd"
+    },
+    {
+      "component": "Calendar",
+      "match": [],
+      "remove": ["moment"],
+      "note": "Moment.js is replaced with dayjs. Update calendar handling accordingly.",
+      "importFrom": "antd",
+      "importTo": "antd"
+    }
+  ],
+  "iconMappings": {
+    "home": "HomeOutlined",
+    "user": "UserOutlined",
+    "setting": "SettingOutlined",
+    "lock": "LockOutlined",
+    "mail": "MailOutlined",
+    "phone": "PhoneOutlined",
+    "flag": "FlagOutlined",
+    "login": "LoginOutlined",
+    "reload": "ReloadOutlined",
+    "edit": "EditOutlined",
+    "delete": "DeleteOutlined",
+    "check-circle": "CheckCircleOutlined",
+    "close-circle": "CloseCircleOutlined",
+    "clock-circle": "ClockCircleOutlined",
+    "info-circle": "InfoCircleOutlined",
+    "warning": "WarningOutlined",
+    "shopping-cart": "ShoppingCartOutlined",
+    "dollar-circle": "DollarCircleOutlined",
+    "line-chart": "LineChartOutlined",
+    "bar-chart": "BarChartOutlined",
+    "table": "TableOutlined",
+    "form": "FormOutlined",
+    "upload": "UploadOutlined",
+    "inbox": "InboxOutlined",
+    "pie-chart": "PieChartOutlined",
+    "folder": "FolderOutlined",
+    "folder-open": "FolderOpenOutlined",
+    "file": "FileOutlined",
+    "file-text": "FileTextOutlined",
+    "picture": "PictureOutlined",
+    "loading": "LoadingOutlined",
+    "search": "SearchOutlined",
+    "bell": "BellOutlined",
+    "down": "DownOutlined",
+    "up": "UpOutlined",
+    "message": "MessageOutlined",
+    "like": "LikeOutlined",
+    "dislike": "DislikeOutlined",
+    "copyright": "CopyrightOutlined",
+    "github": "GithubOutlined",
+    "twitter": "TwitterOutlined",
+    "facebook": "FacebookOutlined",
+    "sync": "SyncOutlined",
+    "exclamation-circle": "ExclamationCircleOutlined",
+    "ant-design": "AntDesignOutlined",
+    "appstore": "AppstoreOutlined"
+  }
+}

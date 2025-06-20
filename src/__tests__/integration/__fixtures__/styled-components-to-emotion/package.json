@@ -1,0 +1,22 @@
+{
+  "name": "styled-components-to-emotion-migration",
+  "version": "1.0.0",
+  "description": "Complex Styled Components to Emotion migration test scenario",
+  "main": "src/index.tsx",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^5.3.11",
+    "polished": "^4.2.2",
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/styled-components": "^5.1.26"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  }
+}

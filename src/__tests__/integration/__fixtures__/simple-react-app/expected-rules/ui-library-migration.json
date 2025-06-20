@@ -1,0 +1,47 @@
+{
+  "lookup": {
+    "@ui-library/components": {
+      "Button": [
+        {
+          "match": [{ "variant": "primary" }],
+          "rename": { "variant": "appearance" },
+          "set": { "appearance": "primary" },
+          "importFrom": "@ui-library/components",
+          "importTo": "@ui-library-v2/components"
+        },
+        {
+          "match": [{ "variant": "secondary" }],
+          "rename": { "variant": "appearance" },
+          "set": { "appearance": "secondary" },
+          "importFrom": "@ui-library/components",
+          "importTo": "@ui-library-v2/components"
+        }
+      ],
+      "Text": [
+        {
+          "match": [{ "size": "large", "weight": "bold" }],
+          "remove": ["size", "weight"],
+          "set": { "variant": "headingLarge" },
+          "importFrom": "@ui-library/components",
+          "importTo": "@ui-library-v2/components"
+        },
+        {
+          "match": [{ "size": "medium" }],
+          "remove": ["size"],
+          "set": { "variant": "bodyMedium" },
+          "importFrom": "@ui-library/components",
+          "importTo": "@ui-library-v2/components"
+        }
+      ],
+      "Card": [
+        {
+          "match": [{ "elevated": true }],
+          "remove": ["elevated"],
+          "set": { "elevation": "raised" },
+          "importFrom": "@ui-library/components",
+          "importTo": "@ui-library-v2/components"
+        }
+      ]
+    }
+  }
+}

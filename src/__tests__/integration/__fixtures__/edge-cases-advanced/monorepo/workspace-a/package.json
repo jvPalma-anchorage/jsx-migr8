@@ -1,0 +1,18 @@
+{
+  "name": "@company/workspace-a",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@company/shared-ui": "workspace:*",
+    "@company/workspace-b": "workspace:*",
+    "@mui/material": "^5.0.0",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  }
+}

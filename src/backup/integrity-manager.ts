@@ -21,16 +21,7 @@ import { AsyncBatchProcessor } from "@/utils/fs-utils";
  * Manages all backup integrity verification operations
  */
 export class IntegrityManager {
-  private batchProcessor: AsyncBatchProcessor<
-    BackedUpFile,
-    IntegrityCheckResult
-  >;
-
-  constructor(concurrency: number = 10) {
-    this.batchProcessor = new AsyncBatchProcessor<
-      BackedUpFile,
-      IntegrityCheckResult
-    >(concurrency);
+  constructor(private concurrency: number = 10) {
   }
 
   /**
@@ -46,12 +37,17 @@ export class IntegrityManager {
 
     try {
       // Verify each file in the backup
-      const fileResults = await this.batchProcessor.process(
+      const batchProcessor = new AsyncBatchProcessor<
+        BackedUpFile,
+        IntegrityCheckResult
+      >(
         metadata.files,
         async (fileInfo: BackedUpFile) =>
           this.verifyBackupFile(backupId, fileInfo, snapshotManager),
-        onProgress,
+        this.concurrency,
       );
+
+      const fileResults = await batchProcessor.process(onProgress);
 
       // Calculate summary statistics
       const summary = {
