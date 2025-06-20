@@ -51,7 +51,7 @@ export const applyRemapRule = (
     // * We can set props for both the NEW ELEMENT
     // * and for its child node, if it has one.
     // *
-    if (rule.replaceWith !== undefined) {
+    if (rule.replaceWith !== undefined && rule.replaceWith !== null && typeof rule.replaceWith === 'object' && rule.replaceWith.code) {
       changed();
       handleReplaceWithJsx(changeCode, {
         rule: rule as RemapRule & { replaceWith: NonNullable<RemapRule['replaceWith']> },

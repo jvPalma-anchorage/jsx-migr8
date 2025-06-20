@@ -8,7 +8,7 @@ import { getContext } from "@/context/globalContext";
 import { makeDiff } from "@/utils/diff";
 import { getCompName } from "@/utils/pathUtils";
 import { applyRemapRule } from "@/remap/utils/rules";
-import { print } from "recast";
+import { print, parse } from "recast";
 import { MigrationMapper } from "@/migrator/types";
 
 /**
@@ -26,13 +26,29 @@ export async function performMigration(
   const couldMigrate: string[] = [];
 
   Object.entries(migrationMapper).forEach((migrationObj) => {
-    const changed = applyRemapRule(changeCode, migrationObj, migr8Spec);
+    const [fileAbsPath, fileCompleteData] = migrationObj;
+    const { codeCompare, elements, importNode } = fileCompleteData;
+    
+    // Clone AST to preserve original for diffs and re-runs
+    const originalAst = codeCompare.ast!;
+    const workingAst = !changeCode ? parse(print(originalAst).code) : originalAst; // Clone only in preview mode
+    
+    // Create a working migration object with cloned AST
+    const workingMigrationObj: [string, typeof fileCompleteData] = [
+      fileAbsPath,
+      {
+        ...fileCompleteData,
+        codeCompare: {
+          ...codeCompare,
+          ast: workingAst
+        }
+      }
+    ];
+    
+    const changed = applyRemapRule(changeCode, workingMigrationObj, migr8Spec);
     if (!changed) {
       return;
     }
-
-    const [fileAbsPath, fileCompleteData] = migrationObj;
-    const { codeCompare, elements, importNode } = fileCompleteData;
 
     const locName = getCompName(
       importNode.local,
@@ -41,7 +57,7 @@ export async function performMigration(
     );
 
     const oldCode = codeCompare!.old || "1 N/A";
-    const newCode = print(codeCompare.ast!).code || "2 N/A";
+    const newCode = print(workingAst).code || "2 N/A";
 
     if (changeCode) {
       writeFileSync(fileAbsPath, newCode);

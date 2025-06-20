@@ -4,7 +4,7 @@
  */
 
 import { performance } from "node:perf_hooks";
-import { print } from "recast";
+import { print, parse } from "recast";
 import { Transform, pipeline } from "node:stream";
 import { promisify } from "node:util";
 
@@ -218,8 +218,21 @@ export class MigrationStream extends Transform {
   ): Promise<MigrationResult> {
     const { filePath, fileData, migr8Spec, changeCode } = task;
 
+    // Clone AST to preserve original for diffs and re-runs
+    const originalAst = fileData.codeCompare.ast!;
+    const workingAst = !changeCode ? parse(print(originalAst).code) : originalAst; // Clone only in preview mode
+    
+    // Create a working migration object with cloned AST
+    const workingFileData = {
+      ...fileData,
+      codeCompare: {
+        ...fileData.codeCompare,
+        ast: workingAst
+      }
+    };
+
     // Apply remap rule
-    const changed = applyRemapRule(changeCode, [filePath, fileData], migr8Spec);
+    const changed = applyRemapRule(changeCode, [filePath, workingFileData], migr8Spec);
 
     if (!changed) {
       return {
@@ -234,12 +247,12 @@ export class MigrationStream extends Transform {
       };
     }
 
-    const { codeCompare, elements, importNode } = fileData;
+    const { codeCompare, elements, importNode } = workingFileData;
     const oldCode = codeCompare?.old || "";
     let newCode: string;
 
     try {
-      newCode = print(codeCompare.ast!).code || "";
+      newCode = print(workingAst).code || "";
     } catch (error) {
       throw new Error(`Failed to print AST: ${error instanceof Error ? error.message : String(error)}`);
     }

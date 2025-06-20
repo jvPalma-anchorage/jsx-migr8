@@ -83,14 +83,13 @@ export const prepareReportToMigrate = (
   componentsSortedByNumberOfProps
     .sort(sortNumberDesc<{ numberOfProps: number }>("numberOfProps"))
     .forEach(({ file, compName }) => {
-      if (!migrationMapper[file].codeCompare.ast) {
-        const [fileAST, _oldCode] = getFileAstAndCode(file);
-        migrationMapper[file].codeCompare = {
-          ast: fileAST,
-          // old: "replace src/migrator/utils/prepareReportToMigrate.ts:82",
-          old: _oldCode,
-        };
-      }
+      // Always reload AST from file system to ensure clean state for each migration run
+      const [fileAST, _oldCode] = getFileAstAndCode(file);
+      migrationMapper[file].codeCompare = {
+        ast: fileAST,
+        // old: "replace src/migrator/utils/prepareReportToMigrate.ts:82",
+        old: _oldCode,
+      };
 
       const elements: JsxUsage[] = [];
 

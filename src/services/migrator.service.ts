@@ -3,6 +3,7 @@
  */
 
 import { IMigratorService, IFileService, IASTService, ILoggerService, IConfigurationService, IBackupService } from '../di/types';
+import { parse, print } from 'recast';
 import { makeDiff } from '../utils/diff';
 import { getCompName } from '../utils/pathUtils';
 import { applyRemapRule } from '../remap/utils/rules';
@@ -257,12 +258,25 @@ export class MigratorService implements IMigratorService {
     
     for (const [fileAbsPath, fileCompleteData] of entries) {
       try {
-        const changed = applyRemapRule(changeCode, [fileAbsPath, fileCompleteData], migr8Spec);
+        const { codeCompare, elements, importNode } = fileCompleteData as any;
+        
+        // Clone AST to preserve original for diffs and re-runs
+        const originalAst = codeCompare.ast;
+        const workingAst = !changeCode ? parse(print(originalAst).code) : originalAst; // Clone only in preview mode
+        
+        // Create a working migration object with cloned AST
+        const workingFileData = {
+          ...fileCompleteData,
+          codeCompare: {
+            ...codeCompare,
+            ast: workingAst
+          }
+        };
+        
+        const changed = applyRemapRule(changeCode, [fileAbsPath, workingFileData], migr8Spec);
         if (!changed) {
           continue;
         }
-
-        const { codeCompare, elements, importNode } = fileCompleteData as any;
 
         const locName = getCompName(
           importNode.local,
@@ -274,7 +288,7 @@ export class MigratorService implements IMigratorService {
         let newCode: string;
 
         try {
-          newCode = this.astService.printAST(codeCompare.ast);
+          newCode = this.astService.printAST(workingAst);
         } catch (error) {
           this.loggerService.error(`Failed to print AST for ${fileAbsPath}:`, error);
           migrationErrors.push(`Print AST failed: ${fileAbsPath}`);

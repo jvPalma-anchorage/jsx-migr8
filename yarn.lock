@@ -2200,6 +2200,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/blessed@npm:^0.1.25":
+  version: 0.1.25
+  resolution: "@types/blessed@npm:0.1.25"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/ec298878c1c9d4202fee26248677c39236d7c0eac8ed8f6e93a9e5838bc531074fe44941e2b85fc77b0cc20924493930d295042ee0315e020dffeba99668737a
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.7, @types/estree@npm:^1.0.6":
   version: 1.0.7
   resolution: "@types/estree@npm:1.0.7"
@@ -2808,6 +2817,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"blessed@npm:^0.1.81":
+  version: 0.1.81
+  resolution: "blessed@npm:0.1.81"
+  bin:
+    blessed: ./bin/tput.js
+  checksum: 10c0/19515ff7899e8af0dd6c080e30e849833ee9518508cc4eabae5a2ea5f17440537a2526169081f20c79d73fbbeca26cc798cc4b037ec250f91f4952b3a75a2143
+  languageName: node
+  linkType: hard
+
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -2999,6 +3017,13 @@ __metadata:
   version: 2.1.0
   resolution: "cjs-module-lexer@npm:2.1.0"
   checksum: 10c0/91cf28686dc3948e4a06dfa03a2fccb14b7a97471ffe7ae0124f62060ddf2de28e8e997f60007babe6e122b1b06a47c01a1b72cc015f185824d9cac3ccfa5533
+  languageName: node
+  linkType: hard
+
+"cli-boxes@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "cli-boxes@npm:3.0.0"
+  checksum: 10c0/4db3e8fbfaf1aac4fb3a6cbe5a2d3fa048bee741a45371b906439b9ffc821c6e626b0f108bdcd3ddf126a4a319409aedcf39a0730573ff050fdd7b6731e99fb9
   languageName: node
   linkType: hard
 
@@ -4850,12 +4875,15 @@ __metadata:
     "@babel/preset-typescript": "npm:7.27.1"
     "@inquirer/prompts": "npm:7.5.3"
     "@jest/globals": "npm:30.0.0"
+    "@types/blessed": "npm:^0.1.25"
     "@types/jest": "npm:30.0.0"
     "@types/node": "npm:22.15.29"
     "@types/yargs": "npm:17.0.33"
     "@typescript-eslint/eslint-plugin": "npm:^8.17.0"
     "@typescript-eslint/parser": "npm:^8.17.0"
+    blessed: "npm:^0.1.81"
     chalk: "npm:5.4.1"
+    cli-boxes: "npm:^3.0.0"
     diff: "npm:8.0.2"
     dotenv: "npm:16.5.0"
     eslint: "npm:9.28.0"
@@ -4867,6 +4895,7 @@ __metadata:
     module-alias: "npm:2.2.3"
     prettier: "npm:3.3.3"
     recast: "npm:0.23.11"
+    terminal-size: "npm:^4.0.0"
     ts-jest: "npm:29.4.0"
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
@@ -6154,6 +6183,13 @@ __metadata:
     mkdirp: "npm:^3.0.1"
     yallist: "npm:^5.0.0"
   checksum: 10c0/d4679609bb2a9b48eeaf84632b6d844128d2412b95b6de07d53d8ee8baf4ca0857c9331dfa510390a0727b550fd543d4d1a10995ad86cdf078423fbb8d99831d
+  languageName: node
+  linkType: hard
+
+"terminal-size@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "terminal-size@npm:4.0.0"
+  checksum: 10c0/642420db433a7753d2ca3b46c217fca9ff7c85c2cfbc964605f1c7fe3b46a98cf99a1815eef61111d1ed3bb99433cf64ae2107a359f3cc31dacba0a3adcbaadd
   languageName: node
   linkType: hard
 

@@ -1,0 +1,89 @@
+{
+  "lookup": "@old-ui/components",
+  "components": [
+    {
+      "name": "Button",
+      "rules": [
+        {
+          "match": [
+            { "variant": "primary" }
+          ],
+          "remove": ["variant"],
+          "set": { "appearance": "primary", "theme": "modern" },
+          "importFrom": "@old-ui/components",
+          "importTo": "@new-ui/button"
+        },
+        {
+          "match": [
+            { "variant": "secondary" }
+          ],
+          "remove": ["variant"],
+          "set": { "appearance": "secondary", "theme": "modern" },
+          "importFrom": "@old-ui/components",
+          "importTo": "@new-ui/button"
+        }
+      ]
+    },
+    {
+      "name": "Text",
+      "rules": [
+        {
+          "match": [
+            { "size": "large", "weight": "bold" }
+          ],
+          "remove": ["size", "weight"],
+          "set": { "variant": "heading" },
+          "importFrom": "@old-ui/components",
+          "importTo": "@new-ui/typography",
+          "replaceWith": {
+            "code": "<Typography {...OUTER_PROPS}>{CHILDREN}</Typography>"
+          }
+        },
+        {
+          "match": [
+            { "size": "medium" }
+          ],
+          "remove": ["size"],
+          "set": { "variant": "body" },
+          "importFrom": "@old-ui/components",
+          "importTo": "@new-ui/typography",
+          "replaceWith": {
+            "code": "<Typography {...OUTER_PROPS}>{CHILDREN}</Typography>"
+          }
+        },
+        {
+          "match": [
+            { "size": "small" }
+          ],
+          "remove": ["size"],
+          "set": { "variant": "caption" },
+          "importFrom": "@old-ui/components",
+          "importTo": "@new-ui/typography",
+          "replaceWith": {
+            "code": "<Typography {...OUTER_PROPS}>{CHILDREN}</Typography>"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Card",
+      "rules": [
+        {
+          "match": [
+            { "elevated": true }
+          ],
+          "remove": ["elevated"],
+          "set": { "shadow": "elevated", "padding": "medium" },
+          "importFrom": "@old-ui/components",
+          "importTo": "@new-ui/surface"
+        },
+        {
+          "match": [],
+          "set": { "shadow": "none", "padding": "medium" },
+          "importFrom": "@old-ui/components",
+          "importTo": "@new-ui/surface"
+        }
+      ]
+    }
+  ]
+}

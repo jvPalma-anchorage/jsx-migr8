@@ -31,11 +31,21 @@ export const handleReplaceWithJsx = (
   changeCode: boolean,
   { rule, elem, compName, filePath }: PropAndRule,
 ) => {
-  const {
-    set,
-    remove,
-    replaceWith: { INNER_PROPS: INNER_PROP_KEYS_TO_MOVE, code },
-  } = rule;
+  const { set, remove, replaceWith } = rule;
+  
+  // Ensure replaceWith has the expected structure
+  if (!replaceWith || typeof replaceWith !== 'object') {
+    console.error(`Invalid replaceWith rule structure for ${compName} in ${filePath}`);
+    return;
+  }
+  
+  const { INNER_PROPS: INNER_PROP_KEYS_TO_MOVE, code } = replaceWith;
+  
+  // Validate required properties
+  if (!code) {
+    console.error(`Missing 'code' property in replaceWith rule for ${compName} in ${filePath}`);
+    return;
+  }
 
   const jsxElement = elem.opener.node;
   const opener = jsxElement.openingElement;
@@ -114,7 +124,7 @@ export const handleReplaceWithJsx = (
     .replace("{' '}", "")
     .replaceAll("\n\n", "\n");
 
-  console.info(makeDiff(filePath, `${oldSnippet}\n`, `(${newSnippet})\n`, 2));
+  //console.info(makeDiff(filePath, `${oldSnippet}\n`, `(${newSnippet})\n`, 2));
 
   elem.opener.replace(newElement);
 };

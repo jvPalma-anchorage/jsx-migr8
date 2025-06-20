@@ -209,6 +209,41 @@ export const getArgv = () => yargs(hideBin(process.argv))
     default: 300000, // 5 minutes
     describe: "Timeout for graph building in milliseconds",
   })
+  .option("fileByFile", {
+    type: "boolean",
+    default: true,
+    describe: "Use file-by-file migration approach (recommended)",
+  })
+  .option("legacy", {
+    type: "boolean",
+    default: false,
+    describe: "Use legacy rule-by-rule migration approach",
+  })
+  .option("skipValidation", {
+    type: "boolean",
+    default: false,
+    describe: "Skip syntax validation after transformation",
+  })
+  .option("contextLines", {
+    type: "number",
+    default: 3,
+    describe: "Number of context lines to show in diffs",
+  })
+  .option("showLineNumbers", {
+    type: "boolean",
+    default: true,
+    describe: "Show line numbers in diffs",
+  })
+  .option("async", {
+    type: "boolean",
+    default: false,
+    describe: "Use async migration processor for large projects",
+  })
+  .option("experimental", {
+    type: "boolean",
+    default: false,
+    describe: "Enable experimental features like interactive diff viewer",
+  })
   .strict()
   .parseSync();
 
