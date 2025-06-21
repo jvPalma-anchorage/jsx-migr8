@@ -1,5 +1,6 @@
 {
   "name": "jsx-migr8",
+  "private": true,
   "version": "1.0.0",
   "description": "Interactive CLI that scans a code-base, analyses JSX component usage and applies codemod-level migrations with preview/diff tooling.",
   "author": "João Vieira Palma <joaovieirapalma@gmail.com>",
